@@ -24,23 +24,29 @@ const dateFixed = computed(() => {
 <template>
   <VCard :title="category?.name" :subtitle="`${sched.venue} @ ${sched.time} (${dateFixed})`" variant="flat">
     <template v-slot:append>
-      <VSelect v-model="sched.status" variant="outlined" hide-details :items="statusSelection" item-value="value" item-title="text"></VSelect>
+      <VSelect class="d-none d-sm-block" v-model="sched.status" variant="outlined" hide-details :items="statusSelection" item-value="value" item-title="text"></VSelect>
     </template>
-    <VList>
+    <VSelect class="d-block d-sm-none mt-3" v-model="sched.status" variant="outlined" hide-details :items="statusSelection" item-value="value" item-title="text"></VSelect>
+    <div v-if="true" class="mt-1">
+      <VSelect :items="participants" item-value="id" item-title="name" label="Selected Participant" hide-details></VSelect>
+    </div>
+    <VList v-else class="mt-5">
       <VListItem v-for="p in participants" :key="p.id"
         :title="p.name"
         :prepend-avatar="p.avatar_path"
+        class="list"
       >
         <template v-slot:append>
-          <div class="d-flex align-center">
+          <p style="font-size: 1.8rem" class="font-weight-bold">{{ p.score }}</p>
+          <div class="ml-5 d-flex align-center">
             <VBtn icon variant="flat" size="small" color="green">
-              <VTooltip activator="parent" location="start">
+              <VTooltip activator="parent" location="bottom">
                 Add Current Score
               </VTooltip>
               <VIcon>mdi-plus</VIcon>
             </VBtn>
-            <VBtn icon variant="flat" size="small" color="red">
-              <VTooltip activator="parent" location="start">
+            <VBtn icon variant="flat" size="small" color="red" class="ml-1">
+              <VTooltip activator="parent" location="bottom">
                 Subtract Current Score
               </VTooltip>
               <VIcon>mdi-minus</VIcon>
@@ -51,3 +57,8 @@ const dateFixed = computed(() => {
     </VList>
   </VCard>
 </template>
+<style scoped>
+.list:nth-child(even){
+  background: rgb(248, 254, 248);
+}
+</style>

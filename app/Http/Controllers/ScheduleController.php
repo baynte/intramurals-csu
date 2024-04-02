@@ -99,8 +99,36 @@ class ScheduleController extends Controller
             return $obj->participant_id;
         });
 
-        $participants = Participant::whereIn('id', $p_id)->get();
+        $participants = collect(Participant::whereIn('id', $p_id)->orderBy('name', 'asc')->get())
+            ->map(function($obj) use ($sched){
+                $s = SchedParticipant::where('participant_id','=', $obj['id'])
+                    ->where('sched_id', '=', $sched->id)
+                    ->first();
+                $obj['score'] = round($s->score) ?: 0;
+                return $obj;
+            });
         return Inertia::render('Admin/Standing', [
+            'category' => $categ,
+            'participants' => $participants,
+            'sched' => $sched,
+        ]);
+    }
+    public function privateStanding(Request $request){
+        $sched = Schedule::findOrFail($request->id);
+        $categ = Category::findOrFail($sched->category_id);
+        $p_id = collect($sched->participants)->map(function($obj){
+            return $obj->participant_id;
+        });
+
+        $participants = collect(Participant::whereIn('id', $p_id)->orderBy('name', 'asc')->get())
+            ->map(function($obj) use ($sched){
+                $s = SchedParticipant::where('participant_id','=', $obj['id'])
+                    ->where('sched_id', '=', $sched->id)
+                    ->first();
+                $obj['score'] = round($s->score) ?: 0;
+                return $obj;
+            });
+        return Inertia::render('UpdateStanding', [
             'category' => $categ,
             'participants' => $participants,
             'sched' => $sched,

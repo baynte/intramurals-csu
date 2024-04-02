@@ -50,3 +50,4 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function(){
     Route::get('/link/schedule/standing', [ScheduleController::class, 'editStanding'])->name('link.schedule.standing');
 });
 
+Route::get('/link/schedule/standing', [ScheduleController::class, 'privateStanding'])->name('link.schedule.standing');
