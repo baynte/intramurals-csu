@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\RubrickController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -48,6 +49,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function(){
 
     Route::apiResource('schedule', ScheduleController::class)->names('schedule');
     Route::get('/link/schedule/standing', [ScheduleController::class, 'editStanding'])->name('link.schedule.standing');
+    
+    Route::apiResource('rubrick', RubrickController::class)->names('rubrick');
+    Route::put('update-rubrick-type/{id}/sched', [RubrickController::class, 'updateRubrickType'])->name('update-rubrick-type');
 });
 
 Route::get('/link/schedule/standing', [ScheduleController::class, 'privateStanding'])->name('link.schedule.standing');

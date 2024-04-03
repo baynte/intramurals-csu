@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Participant;
+use App\Models\Rubrick;
 use App\Models\SchedParticipant;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
@@ -111,6 +112,7 @@ class ScheduleController extends Controller
             'category' => $categ,
             'participants' => $participants,
             'sched' => $sched,
+            'rubricks' => Rubrick::with('insights')->where('year', '=', $sched->year)->get()
         ]);
     }
     public function privateStanding(Request $request){
@@ -119,19 +121,20 @@ class ScheduleController extends Controller
         $p_id = collect($sched->participants)->map(function($obj){
             return $obj->participant_id;
         });
-
+        
         $participants = collect(Participant::whereIn('id', $p_id)->orderBy('name', 'asc')->get())
             ->map(function($obj) use ($sched){
                 $s = SchedParticipant::where('participant_id','=', $obj['id'])
                     ->where('sched_id', '=', $sched->id)
                     ->first();
-                $obj['score'] = round($s->score) ?: 0;
-                return $obj;
-            });
+                    $obj['score'] = round($s->score) ?: 0;
+                    return $obj;
+                });
         return Inertia::render('UpdateStanding', [
             'category' => $categ,
             'participants' => $participants,
             'sched' => $sched,
+            'rubricks' => Rubrick::with('insights')->where('year', '=', $sched->year)->get()
         ]);
     }
 }

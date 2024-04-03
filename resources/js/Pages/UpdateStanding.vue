@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import StandingVue from '@/Components/StandingComponent.vue'
 
 const props = defineProps([
-  'category', 'participants', 'sched'
+  'category', 'participants', 'sched', 'rubricks'
 ])
 
 
@@ -16,7 +16,7 @@ const scoring_type = ref("default")
     <Head title="Edit Standing"></Head>
     <v-main>
       <VContainer>
-        <StandingVue :participants="participants" :category="category" :sched="sched" />
+        <StandingVue :participants="participants" :category="category" :sched="sched" :rubricks="rubricks" />
       </VContainer>
     </v-main>
   </v-app>

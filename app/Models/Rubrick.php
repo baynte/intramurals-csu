@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Schedule extends Model
+class Rubrick extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'status', 'date_from', 'date_to', 'time', 'venue',
-        'description', 'category_id', 'year', 'rubrick_id'
+        'title', 'year'
     ];
 
-    public function participants(){
-        return $this->hasMany(SchedParticipant::class, 'sched_id', 'id');
+    public function insights(){
+        return $this->hasMany(RubrickInsight::class, 'rubrick_id', 'id')
+            ->orderBy('created_at', 'desc');
     }
 }

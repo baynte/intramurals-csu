@@ -1,9 +1,10 @@
 <script setup>
 import { computed, ref } from 'vue'
 import moment from 'moment'
+import { useForm } from '@inertiajs/vue3'
 
 const props = defineProps([
-  'category', 'participants', 'sched'
+  'category', 'participants', 'sched', 'rubricks'
 ])
 
 const sched = ref(props.sched)
@@ -20,6 +21,10 @@ const dateFixed = computed(() => {
   const to = moment(sched.value.date_to, 'YYYY-MM-DD').format('MMMM DD, YYYY')
   return from == to ? from : from + ' - ' + to
 })
+
+const form = useForm({
+  participant_id: null
+})
 </script>
 <template>
   <VCard :title="category?.name" :subtitle="`${sched.venue} @ ${sched.time} (${dateFixed})`" variant="flat">
@@ -27,8 +32,10 @@ const dateFixed = computed(() => {
       <VSelect class="d-none d-sm-block" v-model="sched.status" variant="outlined" hide-details :items="statusSelection" item-value="value" item-title="text"></VSelect>
     </template>
     <VSelect class="d-block d-sm-none mt-3" v-model="sched.status" variant="outlined" hide-details :items="statusSelection" item-value="value" item-title="text"></VSelect>
-    <div v-if="true" class="mt-1">
-      <VSelect :items="participants" item-value="id" item-title="name" label="Selected Participant" hide-details></VSelect>
+    <div v-if="sched.rubrick_id" class="mt-1">
+      <VSelect v-model="form.participant_id" :items="participants" item-value="id" item-title="name" label="Selected Participant" hide-details></VSelect>
+      
+      <VBtn block color="green">Submit</VBtn>
     </div>
     <VList v-else class="mt-5">
       <VListItem v-for="p in participants" :key="p.id"
