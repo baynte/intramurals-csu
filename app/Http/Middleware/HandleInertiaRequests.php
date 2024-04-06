@@ -35,8 +35,10 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $serverHostName = gethostname();
+        $serverIpAddress = getHostByName($serverHostName);
         return array_merge(parent::share($request), [
-            //
+            'ip_address' => $serverIpAddress
         ]);
     }
 }
