@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\RubrickController;
 use App\Http\Controllers\SchedAuthorController;
@@ -24,7 +25,7 @@ Route::get('/', function () {
     return Inertia::render('public');
 })->name('public');
 
-Route::group(['prefix' => 'admin', 'as' => 'admin.'], function(){
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], function(){
     Route::get('/', function(){
         return Inertia::render('Admin/Index');
     })->name('home');
@@ -62,3 +63,10 @@ Route::get('/link/schedule/standing', [ScheduleController::class, 'privateStandi
 Route::put('update/status', [ScheduleController::class, 'UpdateStatus'])->name('update.status');
 Route::put('update-schedule-score', [ScheduleController::class, 'UpdateScore'])->name('update-schedule-score');
 Route::put('update-schedule-score-auth', [ScheduleController::class, 'UpdateAuthScore'])->name('update-schedule-score-auth');
+
+Route::get('/login', [LoginController::class, 'login'])->name('login');
+Route::get('/register', [LoginController::class, 'register']);
+
+Route::post('/login-attempt', [LoginController::class, 'authenticate'])->name('login.authenticate');
+Route::post('/register-user', [LoginController::class, 'credRegister'])->name('login.credRegister');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

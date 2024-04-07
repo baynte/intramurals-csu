@@ -179,6 +179,7 @@ const computedItems = computed(() => {
           avatar_path: p_find?.avatar_path || 'Unkown',
           bg_path: p_find?.bg_path || 'Unkown',
           score: p?.score || 0,
+          rubrick_score: p?.rubrick_score || 0,
         }
       }), ['score'], ['desc'])
     }
@@ -224,7 +225,7 @@ onBeforeMount(()=> {
     </template>
     <template #header-items>
       <VBtn variant="tonal" @click="toggleForm">Create Schedule</VBtn>
-      <VBtn variant="tonal" @click="showFilter = true" prepend-icon="mdi-filter" class="ml-2">{{filterCounter ? `${filterCounter} - Filtered` : "Filter"}}</VBtn>
+      <!-- <VBtn variant="tonal" @click="showFilter = true" prepend-icon="mdi-filter" class="ml-2">{{filterCounter ? `${filterCounter} - Filtered` : "Filter"}}</VBtn> -->
     </template>
     <VDialog v-model="showFilter" max-width="500">
       <VCard title="Filter Items" subtitle="Here we can customize items to be seen in the screen">
@@ -334,7 +335,7 @@ onBeforeMount(()=> {
                       :prepend-avatar="p.avatar_path"
                     >
                       <VListItemAction>
-                        <h3>{{ p.score }}</h3>
+                        <h3>{{ p.rubrick_score }}</h3>
                       </VListItemAction>
                     </VListItem>
                   </VList>
