@@ -5,7 +5,7 @@ import { computed, onBeforeMount, ref, watch } from 'vue';
 import moment from "moment";
 import _ from 'lodash'
 
-const year_items = [2024]
+const year_items = [2024, 2025]
 const form = useForm({
   year: 2024,
   id: null,
@@ -211,6 +211,10 @@ const editStanding = (id) => {
 
 onBeforeMount(()=> {
   getAssets()
+  getItems()
+})
+
+watch(() => form.year, () => {
   getItems()
 })
 </script>

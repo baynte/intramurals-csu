@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('participants', function (Blueprint $table) {
-            $table->string('avatar_path');
-            $table->string('bg_path');
+            $table->string('avatar_path')->nullable();
+            $table->string('bg_path')->nullable();
         });
     }
 
