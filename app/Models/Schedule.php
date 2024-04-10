@@ -19,4 +19,12 @@ class Schedule extends Model
     public function participants(){
         return $this->hasMany(SchedParticipant::class, 'sched_id', 'id');
     }
+
+    public function participants_info(){
+        return $this->hasManyThrough(Participant::class, SchedParticipant::class, 'sched_id', 'id', 'id', 'participant_id');
+    }
+
+    public function category(){
+        return $this->hasOne(Category::class, 'id', 'category_id');
+    }
 }

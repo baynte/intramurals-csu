@@ -15,11 +15,18 @@ class SchedParticipant extends Model
         'sched_id', 'participant_id', 'score'
     ];
 
-    protected $appends = ['rubrick_score'];
+    protected $appends = ['rubrick_score', 'status'];
+
+    public function info(){
+        return $this->hasOne(Participant::class, 'id', 'participant_id');
+    }
 
     public function getRubrickScoreAttribute(){
         $sched = Schedule::findOrFail($this->sched_id);
         if($sched->rubrick_id){
+            if($sched->status != 'finished'){
+                return 0;
+            }
             return number_format(collect(RubrickEvaluation::where('sched_id', '=', $this->sched_id)
             ->where('participant_id', '=', $this->participant_id)
             ->get())
@@ -29,5 +36,10 @@ class SchedParticipant extends Model
         }else{
             return $this->score;
         }
+    }
+
+    public function getStatusAttribute(){
+        $sched = Schedule::findOrFail($this->sched_id);
+        return $sched->status;
     }
 }

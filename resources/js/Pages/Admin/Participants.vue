@@ -148,25 +148,27 @@ getItems()
           <VCardText>
             <VTextField v-model="form.name" label="Name" hide-details></VTextField>
             <VTextarea v-model="form.description" label="Description"/>
-            <VRow justify="center" align="center">
-              <VCol cols="4">
-                <VAvatar @click="activateAvatarSelect" size="80" style="margin: 0 25%">
-                  <VImg :src="form.avatar_path"></VImg>
-                </VAvatar>
-              </VCol>
-              <VCol cols="8">
-                <VBtn @click="activateAvatarSelect" block color="blue" variant="flat" prepend-icon="mdi-camera" size="small">Change Avatar Image</VBtn>
-              </VCol>
-            </VRow>
-            <VDivider class="my-3"></VDivider>
-            <div style="position: relative;">
-              <VImg height="150" cover :src="form.bg_path"></VImg>
-              <VBtn @click="activateBGSelect" style="position: absolute; top: 10px; right: 10px" color="blue" variant="flat" icon size="small">
-                <VIcon>mdi-camera</VIcon>
-                <VTooltip activator="parent">
-                  Change Background Image
-                </VTooltip>
-              </VBtn>
+            <div v-if="form.id">
+              <VRow justify="center" align="center">
+                <VCol cols="4">
+                  <VAvatar @click="activateAvatarSelect" size="80" style="margin: 0 25%">
+                    <VImg :src="form.avatar_path"></VImg>
+                  </VAvatar>
+                </VCol>
+                <VCol cols="8">
+                  <VBtn @click="activateAvatarSelect" block color="blue" variant="flat" prepend-icon="mdi-camera" size="small">Change Avatar Image</VBtn>
+                </VCol>
+              </VRow>
+              <VDivider class="my-3"></VDivider>
+              <div style="position: relative;">
+                <VImg height="150" cover :src="form.bg_path"></VImg>
+                <VBtn @click="activateBGSelect" style="position: absolute; top: 10px; right: 10px" color="blue" variant="flat" icon size="small">
+                  <VIcon>mdi-camera</VIcon>
+                  <VTooltip activator="parent">
+                    Change Background Image
+                  </VTooltip>
+                </VBtn>
+              </div>
             </div>
           </VCardText>
           <VCardActions>

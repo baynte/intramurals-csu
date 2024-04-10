@@ -178,4 +178,23 @@ class ScheduleController extends Controller
         }
         return redirect()->back();
     }
+
+    public function getSelectedDate(Request $request){
+        $items = Schedule::with(['participants_info', 'category'])
+            ->whereDate('date_from', '=', $request->date)
+            ->orWhereDate('date_to', '=', $request->date)
+            ->get();
+
+        return $items;
+    }
+    
+    public function getDtEvents(Request $request){
+        $ids = collect(Schedule::where('category_id', '=', $request->id)->get())
+            ->map(function($obj){ return $obj['id']; });
+        $items = SchedParticipant::with('info')
+            ->whereIn('sched_id', $ids)
+            ->get();
+
+        return $items;
+    }
 }

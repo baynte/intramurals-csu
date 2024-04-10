@@ -6,7 +6,9 @@ use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\RubrickController;
 use App\Http\Controllers\SchedAuthorController;
 use App\Http\Controllers\ScheduleController;
+use App\Models\Category;
 use App\Models\SchedAuthor;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -22,7 +24,22 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('public');
+    $today = now()->format('Y-m-d');
+    $tomorrow = now()->addDays(1)->format('Y-m-d');
+    $today_items = Schedule::with(['participants_info', 'category'])
+        ->whereDate('date_from', '=', $today)
+        ->orWhereDate('date_to', '=', $today)
+        ->get();
+    $tomorrow_items = Schedule::with(['participants_info', 'category'])
+        ->whereDate('date_from', '=', $tomorrow)
+        ->orWhereDate('date_to', '=', $tomorrow)
+        ->get();
+
+    return Inertia::render('public', [
+        'today_scheds' => $today_items,
+        'tomorrow_scheds' => $tomorrow_items,
+        'categories' => Category::get()
+    ]);
 })->name('public');
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], function(){
@@ -70,3 +87,7 @@ Route::get('/register', [LoginController::class, 'register']);
 Route::post('/login-attempt', [LoginController::class, 'authenticate'])->name('login.authenticate');
 Route::post('/register-user', [LoginController::class, 'credRegister'])->name('login.credRegister');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+
+Route::get('/get-selected-date', [ScheduleController::class, 'getSelectedDate'])->name('get-selected-date');
+Route::get('/get-dt-events', [ScheduleController::class, 'getDtEvents'])->name('get-dt-events');
