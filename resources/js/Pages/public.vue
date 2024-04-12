@@ -1,7 +1,7 @@
 <script setup>
 import Public from '@/Layouts/Public.vue';
 import { Head } from '@inertiajs/vue3'
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import moment from 'moment';
 import EventComponentVue from '@/Components/Public/EventComponent.vue';
 import CollegeComponentVue from '@/Components/Public/CollegeComponent.vue';
@@ -44,7 +44,9 @@ watch(datePreviewItems, () => {
 })
 
 const selectedTab = ref(0)
-getSelectedDatePreview()
+onMounted(() => {
+  getSelectedDatePreview()
+})
 </script>
 <template>
   <Public>
@@ -113,7 +115,7 @@ getSelectedDatePreview()
                     </div>
                   </VCard>
                 </div>
-                <VAlert v-else type="info">No Event available to show</VAlert>
+                <VAlert v-else type="info" color="white" class="mt-30">No Event available to show</VAlert>
               </div>
             </v-carousel-item>
             <v-carousel-item>
@@ -165,7 +167,7 @@ getSelectedDatePreview()
                     </div>
                   </VCard>
                   </div>
-                  <VAlert v-else type="info">No Event available to show</VAlert>
+                  <VAlert v-else type="info" color="white" class="mt-30">No Event available to show</VAlert>
                 </div>
               </v-sheet>
             </v-carousel-item>
@@ -213,7 +215,7 @@ getSelectedDatePreview()
             </div>
           </VCard>
         </div>
-        <VAlert v-else type="info">No Event available to show</VAlert>
+        <VAlert v-else type="info" color="white" class="mt-30">No Event available to show</VAlert>
       </div>
       <div class="content d-none d-sm-block">
         <VImg src="/storage/Caraga_State_University_1.png" height="200" alt="CARAGA State University Logo" class="university-logo" />

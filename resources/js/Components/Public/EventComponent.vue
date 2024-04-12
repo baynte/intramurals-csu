@@ -1,16 +1,21 @@
 <template>
   <div>
     <VSelect v-model="selected" label="Category" hide-details :items="categories" item-value="id" item-title="name"></VSelect>
-    <VDataTable :headers="headers" :items="computedItems"></VDataTable>
-    {{ colleges }}
+    <VDataTable :headers="headers" :items="computedItems" :loading="processing"></VDataTable>
+    <!-- {{ colleges }} -->
+    {{ items }}
+
+    <!-- {{ participants }} -->
   </div>  
 </template>
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import _ from 'lodash'
 const props = defineProps(['categories'])
 const selected = ref(null)
 const processing = ref(false)
+
+const participants = ref([])
 const items = ref([])
 
 selected.value = props.categories[0]?.id || null
@@ -20,7 +25,8 @@ const getItems = () => {
     method: 'GET',
     url: route('get-dt-events', {id: selected.value})
   }).then(res => {
-    items.value = res.data
+    items.value = res.data.items
+    participants.value = res.data.participants
   }).finally(() => {
     processing.value = false
   })
@@ -29,20 +35,30 @@ const getItems = () => {
 const headers = computed(() => {
   return [
     { title: 'College', key: 'name' },
-    { title: 'Wins', key: 'wins' },
-    { title: 'Loss', key: 'loss' },
-    { title: 'Draws', key: 'draws' },
+    { title: 'Wins', key: 'wins', align: 'center' },
+    { title: 'Loss', key: 'loss', align: 'center' },
+    { title: 'Draws', key: 'draws', align: 'center' },
+    { title: 'TBA', key: 'tba', align: 'center' },
   ]
 })
 
 
 const colleges = computed(() => {
-  if(!items.value.length) return []
-  return _.orderBy(_.uniqBy(items.value.map(x => x.info), 'id'), ['name'], ['asc'])
+  if(!participants.value.length) return []
+  return _.orderBy(_.uniqBy(participants.value, 'id'), ['name'], ['asc'])
 })
 
 const computedItems = computed(() => {
-  return colleges.value
+  const c = colleges.value.map(function(obj){
+    return { id: obj.id, wins: [], loss: [], draw: [], tba: [] }
+  })
+  
+  items.value.forEach(function(obj){
+    if(obj.status != 'finished'){
+        
+    }
+  })
+
 })
 
 watch(selected, () => {
@@ -50,5 +66,8 @@ watch(selected, () => {
     getItems()
   }
 })
-getItems()
+
+onMounted(() => {
+  getItems()
+})
 </script>

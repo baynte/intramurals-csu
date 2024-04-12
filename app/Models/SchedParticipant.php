@@ -25,7 +25,7 @@ class SchedParticipant extends Model
         $sched = Schedule::findOrFail($this->sched_id);
         if($sched->rubrick_id){
             if($sched->status != 'finished'){
-                return 0;
+                return -1;
             }
             return number_format(collect(RubrickEvaluation::where('sched_id', '=', $this->sched_id)
             ->where('participant_id', '=', $this->participant_id)
@@ -40,6 +40,19 @@ class SchedParticipant extends Model
 
     public function getStatusAttribute(){
         $sched = Schedule::findOrFail($this->sched_id);
-        return $sched->status;
+        if($sched->status != 'finished'){
+            return -1;
+        }
+        $p = collect($sched->participants)
+            ->map(function($obj){
+                return ['id' => $obj->id, 'score' => $obj->rubrick_score];
+            })->sortBy('score');
+
+        $id = $this->id;
+        $index = $p->search(function ($item, $key) use ($id) {
+            return $item['id'] === $id; // Change 'Jane' to the name you want to find
+        });
+
+        return $index + 1;
     }
 }

@@ -189,12 +189,22 @@ class ScheduleController extends Controller
     }
     
     public function getDtEvents(Request $request){
-        $ids = collect(Schedule::where('category_id', '=', $request->id)->get())
+        $query = Schedule::
+            where('year', '=', 2024)
+            ->where('category_id', '=', $request->id)->get();
+        
+        $ids = collect($query)
             ->map(function($obj){ return $obj['id']; });
-        $items = SchedParticipant::with('info')
+    
+        $participants = collect(SchedParticipant::with('info')
             ->whereIn('sched_id', $ids)
-            ->get();
+            ->get())->map(function($obj){
+                return $obj['info'];
+            });
 
-        return $items;
+        return response()->json([
+            'participants' => $participants,
+            'items' => $query->load('participants')
+        ]);
     }
 }
