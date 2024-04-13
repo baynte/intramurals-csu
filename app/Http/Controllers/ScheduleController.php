@@ -148,10 +148,72 @@ class ScheduleController extends Controller
         ]);
     }
 
+    private function computeStatus($array){
+        $collection = collect($array);
+        
+        // Step 2: Compute rankings and handle draws
+        $ranked = $collection->sortByDesc('rubrick_score');
+
+        $highest = 0;
+        $id = null;
+        $chk_draw = [];
+
+        $ranked->each(function($obj) use (&$highest, &$id, &$chk_draw){
+            if($id == null){
+                $highest = $obj['rubrick_score'];
+                $id = $obj['id'];
+            }else{
+                if($highest < $obj['rubrick_score']){
+                    $highest = $obj['rubrick_score'];
+                    $id = $obj['id'];
+                }
+            }
+            $chk_draw[] = floatval($obj['rubrick_score']);
+        });
+        info($chk_draw);
+
+        $firstElement = reset($chk_draw); // Get the first element of the array
+
+        $allSame = true; // Assume all elements are the same initially
+
+        foreach ($chk_draw as $element) {
+            if ($element !== $firstElement) {
+                $allSame = false; // If any element is different from the first one, set $allSame to false
+                break; // Exit the loop since we already know they are not all the same
+            }
+        }
+
+        if ($allSame) {
+            $ranked->each(function($obj){
+                $s = SchedParticipant::find($obj['id']);
+                $s->status = 'draw';
+                $s->save();
+            });
+        } else {
+            $ranked->each(function($obj){
+                $s = SchedParticipant::find($obj['id']);
+                $s->status = 'loss';
+                $s->save();
+            });
+            $s = SchedParticipant::find($id);
+            $s->status = 'winner';
+            $s->save();
+        }
+
+    }
+
     public function UpdateStatus(Request $request){
         $sched = Schedule::findOrFail($request->sched_id);
         $sched->status = $request->status;
         $sched->save();
+        if($sched->status == 'finished'){
+            $this->computeStatus($sched->participants);
+        }else{
+            foreach($sched->participants as $p){
+                $p->status = null;
+                $p->save();
+            }
+        }
         return response()->json(['msg'=> 'success']);
     }
 
@@ -159,6 +221,16 @@ class ScheduleController extends Controller
         $sp = SchedParticipant::findOrFail($request->sched_participant_id);
         $sp->score = number_format($request->score, 2);
         $sp->save();
+
+        $sched = Schedule::findOrFail($sp->sched_id);
+        if($sched->status == 'finished'){
+            $this->computeStatus($sched->participants);
+        }else{
+            foreach($sched->participants as $p){
+                $p->status = null;
+                $p->save();
+            }
+        }
         return response()->json(['msg'=>'updated']);
     }
 
@@ -198,10 +270,9 @@ class ScheduleController extends Controller
     
         $participants = collect(SchedParticipant::with('info')
             ->whereIn('sched_id', $ids)
-            ->get())->map(function($obj){
-                return $obj['info'];
-            });
+            ->get());
 
+        // info($participants);
         return response()->json([
             'participants' => $participants,
             'items' => $query->load('participants')

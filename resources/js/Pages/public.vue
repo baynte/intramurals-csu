@@ -225,7 +225,7 @@ onMounted(() => {
       <div class="bg-p pb-3">
         <div class="bg-s" style="height: 28px"></div>
         <!-- <VSelect density="compact" label="Year" hide-details bg-color="white"></VSelect> -->
-        <VCard class="mx-2 my-2">
+        <VCard class="mx-auto my-2" max-width="600">
           <VTabs v-model="selectedTab">
             <VTab>Events</VTab>
             <VTab>Colleges</VTab>

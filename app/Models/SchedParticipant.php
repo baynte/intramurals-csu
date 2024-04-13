@@ -12,10 +12,10 @@ class SchedParticipant extends Model
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'sched_id', 'participant_id', 'score'
+        'sched_id', 'participant_id', 'score', 'status'
     ];
 
-    protected $appends = ['rubrick_score', 'status'];
+    protected $appends = ['rubrick_score'];
 
     public function info(){
         return $this->hasOne(Participant::class, 'id', 'participant_id');
@@ -36,23 +36,5 @@ class SchedParticipant extends Model
         }else{
             return $this->score;
         }
-    }
-
-    public function getStatusAttribute(){
-        $sched = Schedule::findOrFail($this->sched_id);
-        if($sched->status != 'finished'){
-            return -1;
-        }
-        $p = collect($sched->participants)
-            ->map(function($obj){
-                return ['id' => $obj->id, 'score' => $obj->rubrick_score];
-            })->sortBy('score');
-
-        $id = $this->id;
-        $index = $p->search(function ($item, $key) use ($id) {
-            return $item['id'] === $id; // Change 'Jane' to the name you want to find
-        });
-
-        return $index + 1;
     }
 }

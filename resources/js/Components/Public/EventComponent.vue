@@ -2,10 +2,6 @@
   <div>
     <VSelect v-model="selected" label="Category" hide-details :items="categories" item-value="id" item-title="name"></VSelect>
     <VDataTable :headers="headers" :items="computedItems" :loading="processing"></VDataTable>
-    <!-- {{ colleges }} -->
-    {{ items }}
-
-    <!-- {{ participants }} -->
   </div>  
 </template>
 <script setup>
@@ -19,17 +15,21 @@ const participants = ref([])
 const items = ref([])
 
 selected.value = props.categories[0]?.id || null
-const getItems = () => {
-  processing.value = true
-  axios({
-    method: 'GET',
-    url: route('get-dt-events', {id: selected.value})
-  }).then(res => {
-    items.value = res.data.items
-    participants.value = res.data.participants
-  }).finally(() => {
-    processing.value = false
-  })
+const getItems = (indicateProgress) => {
+  processing.value = indicateProgress
+  if(selected.value){
+    axios({
+      method: 'GET',
+      url: route('get-dt-events', {id: selected.value})
+    }).then(res => {
+      items.value = res.data.items
+      participants.value = res.data.participants?.map(function(obj){
+        return {...obj.info, status: obj.status, score: obj.score}
+      })
+    }).finally(() => {
+      processing.value = false
+    })
+  }
 }
 
 const headers = computed(() => {
@@ -49,25 +49,30 @@ const colleges = computed(() => {
 })
 
 const computedItems = computed(() => {
-  const c = colleges.value.map(function(obj){
-    return { id: obj.id, wins: [], loss: [], draw: [], tba: [] }
-  })
-  
-  items.value.forEach(function(obj){
-    if(obj.status != 'finished'){
-        
+  return colleges.value.map(function(obj){
+    const p_c = participants.value.filter(x => x.id == obj.id)
+    return { ...obj, 
+      wins: p_c.filter(x => x.status == 'winner').length, 
+      loss: p_c.filter(x => x.status == 'loss').length,
+      draws: p_c.filter(x => x.status == 'draw').length,
+      tba: p_c.filter(x => x.status == null).length,
+      // wins: 1, 
+      // loss: 1,
+      // draws: 1,
     }
   })
-
 })
 
 watch(selected, () => {
   if(selected.value){
-    getItems()
+    getItems(true)
   }
 })
 
 onMounted(() => {
-  getItems()
+  getItems(true)
+  setInterval(() => {
+    getItems(false)
+  }, 3000)
 })
 </script>
