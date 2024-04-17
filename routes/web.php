@@ -74,6 +74,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     
     Route::apiResource('rubrick', RubrickController::class)->names('rubrick');
     Route::put('update-rubrick-type/{id}/sched', [RubrickController::class, 'updateRubrickType'])->name('update-rubrick-type');
+
+    Route::put('/update-score-contribution', [ScheduleController::class, 'updateScoreContribution'])->name('update-score-contribution');
 });
 
 Route::get('/link/schedule/standing', [ScheduleController::class, 'privateStanding'])->name('link.schedule.standing');
@@ -91,3 +93,5 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/get-selected-date', [ScheduleController::class, 'getSelectedDate'])->name('get-selected-date');
 Route::get('/get-dt-events', [ScheduleController::class, 'getDtEvents'])->name('get-dt-events');
+
+Route::get('get-colleges', [ParticipantController::class, 'getParticipantPerYear'])->name('get-colleges');

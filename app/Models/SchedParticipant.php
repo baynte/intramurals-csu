@@ -12,7 +12,7 @@ class SchedParticipant extends Model
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'sched_id', 'participant_id', 'score', 'status'
+        'sched_id', 'participant_id', 'score', 'status', 'contribution_score'
     ];
 
     protected $appends = ['rubrick_score'];

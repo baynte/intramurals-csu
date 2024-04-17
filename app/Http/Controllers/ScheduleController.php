@@ -33,6 +33,7 @@ class ScheduleController extends Controller
             'status' => 'pending',
             'category_id' => $request->category_id,
             'year' => $request->year,
+            'class_type' => $request->class_type,
             'date_from' => $request->date_from, 
             'date_to' => $request->date_to, 
             'time' => $request->time, 
@@ -67,6 +68,7 @@ class ScheduleController extends Controller
         $sched = Schedule::findOrFail($id);
         $sched->category_id = $request->category_id;
         $sched->year = $request->year;
+        $sched->class_type = $request->class_type;
         $sched->date_from = $request->date_from; 
         $sched->date_to = $request->date_to; 
         $sched->time = $request->time; 
@@ -109,6 +111,7 @@ class ScheduleController extends Controller
                     ->first();
                 $obj['sched_participant_id'] = $s->id;
                 $obj['score'] = round($s->score) ?: 0;
+                $obj['contribution_score'] = round($s->contribution_score) ?: null;
                 return $obj;
             });
             return Inertia::render('Admin/Standing', [
@@ -211,6 +214,7 @@ class ScheduleController extends Controller
         }else{
             foreach($sched->participants as $p){
                 $p->status = null;
+                $p->contribution_score = null;
                 $p->save();
             }
         }
@@ -277,5 +281,12 @@ class ScheduleController extends Controller
             'participants' => $participants,
             'items' => $query->load('participants')
         ]);
+    }
+
+    public function updateScoreContribution(Request $request){
+        $p = SchedParticipant::findOrFail($request->id);
+        $p->contribution_score = $request->score ?: null;
+        $p->save();
+        return response()->json(['msg' => 'success']);
     }
 }

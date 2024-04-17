@@ -6,9 +6,11 @@ import moment from "moment";
 import _ from 'lodash'
 
 const year_items = [2024, 2025]
+const class_selections = ['standing', 'finals']
 const form = useForm({
   year: 2024,
   id: null,
+  class_type: 'standing',
   time: "",
   venue: "Inside Campus",
   date_from: "",
@@ -117,6 +119,7 @@ const submitForm = () => {
     venue,
     year,
     date_from,
+    class_type,
     date_to,
     category_id,
     participants_id,
@@ -128,6 +131,7 @@ const submitForm = () => {
       time,
       year,
       venue,
+      class_type,
       date_from,
       date_to,
       category_id,
@@ -146,6 +150,7 @@ const submitForm = () => {
       year,
       venue,
       date_from,
+      class_type,
       date_to,
       category_id,
       participants_id,
@@ -167,6 +172,7 @@ const computedItems = computed(() => {
     const categ = categories.value.find(x => x.id == obj.category_id)
     return {
       id: obj.id,
+      class_type: obj.class_type,
       category_name: categ?.name || 'Uknown',
       status: obj.status || 'Pending',
       date_from: moment(obj.date_from, 'YYYY-MM-DD').format('MMM DD, YYYY'),
@@ -190,6 +196,7 @@ const headers = computed(() => {
   return [
     { title: '', key: 'more', sortable: false },
     { title: 'Category', key: 'category_name' },
+    { title: 'Class', key: 'class_type' },
     { title: 'Status', key: 'status', align: 'center' },
     { title: 'Participants', key: 'participants', align: 'center' },
     { title: 'Date From', key: 'date_from', align: 'center' },
@@ -202,6 +209,11 @@ const headers = computed(() => {
 const statusColor = (status) => {
   if(status == 'pending') return 'gray'
   if(status == 'on-going') return 'green'
+  if(status == 'finished') return 'blue'
+}
+const classColor = (status) => {
+  if(status == 'finals') return 'blue'
+  if(status == 'standing') return 'gray'
   if(status == 'finished') return 'blue'
 }
 
@@ -259,10 +271,11 @@ watch(() => form.year, () => {
         </VCardActions>
       </VCard>
     </VDialog>
-    <VDialog v-model="showForm" max-width="500">
+    <VDialog v-model="showForm" max-width="500" scrollable>
       <VCard :title="`${form.id ? '(Edit) ' : ''}Schedule Form`" subtitle="Please fill the entries">
         <VDivider/>
         <VCardText>
+          <VSelect v-model="form.class_type" :items="class_selections" label="Class Type" hide-details></VSelect>
           <div class="d-flex">
             <VTextField v-model="form.date_from" @change="formDateFromWasChanged" type="date" label="Date From" hide-details clearable></VTextField>
             <VTextField v-model="form.date_to" :min="form.date_from" :disabled="form.date_from ? false : true" 
@@ -300,10 +313,13 @@ watch(() => form.year, () => {
               </div>
             </template>
             <template v-slot:[`item.edit_standing`]="{ item }">
-              <VBtn @click="editStanding(item.id)" variant="flat" color="blue" size="small">Edit Standing</VBtn>
+              <VBtn @click="editStanding(item.id)" variant="flat" color="blue" size="small">Update Score</VBtn>
             </template>
             <template v-slot:[`item.status`]="{ item }">
               <VChip :color="statusColor(item.status)" size="small" class="text-uppercase">{{ item.status }}</VChip>
+            </template>
+            <template v-slot:[`item.class_type`]="{ item }">
+              <VChip :color="classColor(item.class_type)" variant="flat" size="small" class="text-uppercase">{{ item.class_type }}</VChip>
             </template>
             <template v-slot:[`item.participants`]="{ item }">
               <VMenu location="end">

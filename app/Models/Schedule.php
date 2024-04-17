@@ -13,7 +13,8 @@ class Schedule extends Model
 
     protected $fillable = [
         'status', 'date_from', 'date_to', 'time', 'venue',
-        'description', 'category_id', 'year', 'rubrick_id'
+        'description', 'category_id', 'year', 'rubrick_id',
+        'class_type'
     ];
 
     public function participants(){

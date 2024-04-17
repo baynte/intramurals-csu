@@ -3,6 +3,7 @@
 import { Head, router, useForm, usePage } from '@inertiajs/vue3'
 import { computed, ref, watch } from 'vue'
 import StandingVue from '@/Components/StandingComponent.vue'
+import _ from 'lodash';
 
 const props = defineProps([
   'category', 'participants', 'sched', 'rubricks', 'authors'
@@ -16,6 +17,8 @@ if(props.sched.rubrick_id){
   scoring_type.value = "rubrick"
   rubrickId.value = props.sched.rubrick_id
 }
+
+const p_ = ref([...props.participants])
 
 watch(scoring_type, (newValue) => {
   if(newValue === 'default'){
@@ -72,6 +75,42 @@ const convertLink = (sched_id, auth_id) => {
   const pathname = (window.location.pathname).replace('/admin', '')
   return `${protocol}//${ip_address.value}:8000${pathname}?id=${sched_id}&author_id=${auth_id}`
 }
+
+
+// const submitUpdateContriScore = _.debounce(function(id, score){
+//   axios({
+//     url: route('admin.update-score-contribution'),
+//     method: 'PUT',
+//     data: {
+//       id, score
+//     }
+//   })
+//   console.log(id, score)
+// }, 300)
+
+const submitUpdateContriScore = (id, score) => {
+    axios({
+      url: route('admin.update-score-contribution'),
+      method: 'PUT',
+      data: {
+        id, score
+      }
+    })
+}
+
+const updateContriScore = () => {
+  p_.value.forEach(function(item){
+    submitUpdateContriScore(item.sched_participant_id, item.contribution_score)
+  })
+}
+
+watch(() => props.sched.status, (newVal, oldVal) => {
+  if(newVal != 'finished'){
+    p_.value = p_.value.map(function(x){
+      return {...x, contribution_score: null}
+    }) 
+  }
+})
 </script>
 <template>
   <v-app>
@@ -130,7 +169,7 @@ const convertLink = (sched_id, auth_id) => {
                 <VBtn block :disabled="!canProceedUpdateRubrick" size="small" color="blue" variant="flat" @click="updateRubrickType">Update</VBtn>
               </VCardActions>
             </VCard>
-            <VCard class="mt-5" title="Authorized Staff" subtitle="A list of staff who can alter the scoring system">
+            <VCard class="my-5" title="Authorized Staff" subtitle="A list of staff who can alter the scoring system">
               <VAlert v-if="!authors.length" type="warning" class="mx-2 my-2">No authorized staff included</VAlert>
               <VList v-else>
                 <VListItem v-for="item in authors" @click="toggleShowAuthor(item)"
@@ -145,6 +184,15 @@ const convertLink = (sched_id, auth_id) => {
               <VDivider></VDivider>
               <VCardActions>
                 <VBtn size="small" color="blue" variant="flat" @click="toggleAuthorForm">Add staff</VBtn>
+              </VCardActions>
+            </VCard>
+            
+            <VCard v-if="sched.status == 'finished'" title="Score Contribution" subtitle="This will be computed for the overall total of score.">
+              <VCardText>
+                <VTextField type="number" v-for="p in p_" :key="p.id" v-model="p.contribution_score" :label="p.name" hide-details></VTextField>
+              </VCardText>
+              <VCardActions>
+                <VBtn variant="flat" color="blue" @click="updateContriScore">Submit</VBtn>
               </VCardActions>
             </VCard>
           </VCol>

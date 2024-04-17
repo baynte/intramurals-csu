@@ -1,7 +1,13 @@
 <template>
   <div>
     <VSelect v-model="selected" label="Category" hide-details :items="categories" item-value="id" item-title="name"></VSelect>
-    <VDataTable :headers="headers" :items="computedItems" :loading="processing"></VDataTable>
+    <VDataTable :headers="headers" :items="computedItems" :loading="processing">
+      <template v-slot:[`item.avatar_path`]="{item}">
+        <VAvatar>
+          <VImg :src="item.avatar_path"/>
+        </VAvatar>
+      </template>
+    </VDataTable>
   </div>  
 </template>
 <script setup>
@@ -34,6 +40,7 @@ const getItems = (indicateProgress) => {
 
 const headers = computed(() => {
   return [
+    { title: '', key: 'avatar_path', sortable: false, },
     { title: 'College', key: 'name' },
     { title: 'Wins', key: 'wins', align: 'center' },
     { title: 'Loss', key: 'loss', align: 'center' },

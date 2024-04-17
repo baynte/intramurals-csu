@@ -94,4 +94,8 @@ class ParticipantController extends Controller
         ->orderBy('name', 'ASC')
         ->get();
     }
+
+    public function getParticipantPerYear(Request $request){
+        return Participant::get();
+    }
 }
