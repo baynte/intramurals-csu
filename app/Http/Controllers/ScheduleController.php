@@ -299,6 +299,19 @@ class ScheduleController extends Controller
         ->get();   
     }
 
+    public function getOverall(){
+        $p = collect(SchedParticipant::with('info')
+            ->whereNotNull('contribution_score')
+            ->selectRaw('participant_id, SUM(contribution_score) as total_score')
+            ->groupBy('participant_id')
+            ->get())->map(function($obj){
+                $item = $obj['info'];
+                $item['total_points'] = $obj['total_score'];
+                return $item;
+            })->sortByDesc('total_score');
+        return $p;
+    }
+
 
     public function getCategoriesPerCollege(Request $request){
         $categ = collect(Category::get());

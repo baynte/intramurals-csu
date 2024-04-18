@@ -53,12 +53,12 @@ const getColleges = async() => {
 }
 
 
-const getItems = () => {
-  processing.value = true
+const getItems = (process) => {
+  processing.value = process
   axios.get(route('get-category-standing-per-college', {id: selectedCollege.value}))
   .then((res) => {
     items.value = res.data
-    console.log(res.data)
+    // console.log(res.data)
   })
   .finally(() => {
     processing.value = false
@@ -66,11 +66,13 @@ const getItems = () => {
 }
 
 watch(selectedCollege, () => {
-  getItems()
+  getItems(true)
 })
 
 onBeforeMount(() => {
   getColleges()
-  // getItems()
+  setInterval(() => {
+    getItems(false)
+  }, 3000)
 })
 </script>
