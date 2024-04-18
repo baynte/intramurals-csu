@@ -289,4 +289,16 @@ class ScheduleController extends Controller
         $p->save();
         return response()->json(['msg' => 'success']);
     }
+
+    public function getSchedPerDate(Request $request){
+        return Schedule::with(['participants_info', 'category'])
+        ->whereDate('date_from', '=', $request->date)
+        ->orWhereDate('date_to', '=', $request->date)
+        ->get();   
+    }
+
+
+    public function getCategoriesPerCollege(Request $request){
+        info($request);
+    }
 }

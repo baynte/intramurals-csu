@@ -6,7 +6,7 @@ import moment from "moment";
 import _ from 'lodash'
 
 const year_items = [2024, 2025]
-const class_selections = ['standing', 'finals']
+const class_selections = ['standing', 'semi-finals', 'finals']
 const form = useForm({
   year: 2024,
   id: null,

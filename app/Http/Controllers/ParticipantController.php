@@ -98,4 +98,5 @@ class ParticipantController extends Controller
     public function getParticipantPerYear(Request $request){
         return Participant::get();
     }
+
 }

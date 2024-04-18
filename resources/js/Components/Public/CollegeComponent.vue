@@ -34,7 +34,15 @@ const getColleges = async() => {
   }
 }
 
+const getItems = () => {
+  axios.get(route('get-category-standing-per-college', {id: selectedCollege.value}))
+  .then((res) => {
+    console.log(res.data)
+  })
+}
+
 onBeforeMount(() => {
   getColleges()
+  getItems()
 })
 </script>

@@ -9,8 +9,8 @@ import OverallComponentVue from '@/Components/Public/OverallComponent.vue';
 const bgPic = ref('/storage/events/1.jpeg');
 
 const changePhoto = () => {
-  const num = Math.floor(Math.random() * 8)
-  bgPic.value = `/storage/events/${num}.jpeg`
+  const num = Math.floor(Math.random() * 7)
+  bgPic.value = `/storage/events/${num+1}.jpeg`
 }
 
 setInterval(changePhoto, 3000);
@@ -52,11 +52,7 @@ watch(datePreviewItems, () => {
 
 const selectedTab = ref(0)
 
-
-onMounted(() => {
-  getSelectedDatePreview()
-})
-
+const selectedDate = ref(moment().format('YYYY-MM-D'))
 const currentDate = ref(new Date());
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -73,8 +69,15 @@ const daysInMonth = computed(() => {
   const year = currentDate.value.getFullYear();
   const month = currentDate.value.getMonth();
   const numDays = new Date(year, month + 1, 0).getDate();
-  return Array.from({ length: numDays }, (_, i) => i + 1);
+  return Array.from({ length: numDays }, (_, i) => i + 1).map(function(d){
+    const isSelected = selectedDate.value == moment(`${year}-${month+1}-${d}`, 'YYYY-M-D').format('YYYY-MM-D')
+    return { day: d, isSelected, isToday: false, value: moment(`${year}-${month+1}-${d}`, 'YYYY-M-D').format('YYYY-MM-D') }
+  });
 });
+
+const changeDateSelected = (value) => {
+  selectedDate.value = value
+}
 
 const previousMonth = () => {
   const newDate = new Date(currentDate.value);
@@ -87,6 +90,35 @@ const nextMonth = () => {
   newDate.setMonth(newDate.getMonth() + 1);
   currentDate.value = newDate;
 };
+
+const backToday = () => {
+  selectedDate.value = moment().format('YYYY-MM-D')
+  currentDate.value = new Date();
+}
+
+const selectedDateSched = ref([])
+const processingSelectedSched = ref(false)
+
+const getSelectedDateSched = () => {
+  processingSelectedSched.value = true
+  const date = moment(selectedDate.value, 'YYYY-MM-D').format('YYYY-MM-DD')
+  axios.get(route('get-sched-per-date', {date}))
+  .then(res => {
+    selectedDateSched.value = res.data
+  })
+  .finally(() => {
+    processingSelectedSched.value = false
+  })
+}
+
+watch(selectedDate, () => {
+  getSelectedDateSched()
+})
+
+onMounted(() => {
+  getSelectedDatePreview()
+  getSelectedDateSched()
+})
 </script>
 <template>
   <Public>
@@ -310,7 +342,7 @@ const nextMonth = () => {
                     <div class="bg-s py-2">TODAY</div>
                   </section>
                   <div style="overflow-x: auto" class="d-flex">
-                    <section v-for="item in today_scheds" :key="item.id" variant="flat" style="" class="d-flex flex-column">
+                    <section v-for="item in today_scheds" :key="item.id" variant="flat" style="" class="sched-items d-flex flex-column">
                       <div class="flex-grow-1">
                         <div class="px-3 py-3 text-center">
                           <h4>
@@ -365,7 +397,7 @@ const nextMonth = () => {
                     <div class="bg-s py-2 px-2">TOMORROW</div>
                   </section>
                   <div style="overflow-x: auto" class="d-flex">
-                    <section v-for="item in tomorrow_scheds" :key="item.id" variant="flat" style="" class="d-flex flex-column">
+                    <section v-for="item in tomorrow_scheds" :key="item.id" variant="flat" style="" class="sched-items d-flex flex-column">
                       <div class="flex-grow-1">
                         <div class="px-3 py-3 text-center">
                           <h4>
@@ -413,23 +445,92 @@ const nextMonth = () => {
             </VRow>
           </div>
         </div>
-        <div class="mx-auto" style="width: 700px">
-          <div class="calendar">
-            <div class="header">
-              <button @click="previousMonth" icon>
-                <VIcon>mdi-chevron-left</VIcon>
-              </button>
-              <h2>{{ currentMonth }}</h2>
-              <button @click="nextMonth">
-                <VIcon>mdi-chevron-right</VIcon>
-              </button>
-            </div>
-            <div class="days">
-              <div v-for="(day, index) in daysInMonth" :key="index" class="day">{{ day }}</div>
-            </div>
-          </div>
+        <div class="mx-auto mt-4 mb-5" style="width: 800px">
+          <VRow>
+            <VCol cols="5">
+              <VCard>
+                <VToolbar color="#327119">
+                  <VBtn @click="previousMonth" icon>
+                    <VIcon>mdi-chevron-left</VIcon>
+                  </VBtn>
+                  <VToolbarTitle class="text-uppercase">{{ currentMonth }}</VToolbarTitle>
+                  <VBtn @click="nextMonth">
+                    <VIcon>mdi-chevron-right</VIcon>
+                  </VBtn>
+                </VToolbar>
+                <VCardText>
+                  <div class="calendar">
+                    <div class="days">
+                      <div v-for="(day_item, index) in daysInMonth" :key="index" class="day cursor-pointer" @click="changeDateSelected(day_item.value)">
+                        <VAvatar v-if="day_item.isSelected" rounded color="green" size="small">
+                          {{day_item.day}}
+                        </VAvatar>
+                        <VAvatar v-else rounded color="white" size="small">
+                          {{day_item.day}}
+                        </VAvatar>
+                      </div>
+                    </div>
+                  </div>
+                </VCardText>
+                <VCardActions>
+                  <VBtn variant="tonal" @click="backToday">Today</VBtn>
+                </VCardActions>
+              </VCard>
+            </VCol>
+            <VCol cols="7">
+              <VCard color="#327119" class="mb-3">
+                <VCardText class="font-weight-bold">
+                  {{ moment(selectedDate, 'YYYY-MM-D').format('DD MMMM YYYY | dddd') }}
+                </VCardText>
+              </VCard>
+              <VProgressLinear v-if="processingSelectedSched" indeterminate color="#327119"></VProgressLinear>
+              <div v-if="selectedDateSched.length" class="px-1 py-1" style="max-height: calc(100vh - 100px); overflow-y: auto">
+                  <VCard v-for="item in selectedDateSched" :key="item.id" class="mb-2">
+                    <div style="position: relative" class="d-flex justify-center align-center py-2">
+                      <div v-if="item.participants_info.length == 2" class="d-flex justify-center align-center">
+                        <VAvatar>
+                          <VImg :src="item.participants_info[0].avatar_path"/>
+                          <VTooltip activator="parent" location="start">
+                            {{ item.participants_info[0]?.name }}
+                          </VTooltip>
+                        </VAvatar>
+                        <h3 class="mx-2">VS</h3>
+                        <VAvatar>
+                          <VImg :src="item.participants_info[1].avatar_path"/>
+                          <VTooltip activator="parent" location="end">
+                            {{ item.participants_info[1]?.name }}
+                          </VTooltip>
+                        </VAvatar>
+                      </div>
+                      <div v-else class="d-flex">
+                        <VAvatar color="green" v-for="p in item.participants_info" :key="p.id" class="mx-1">
+                          <VImg :src="p.avatar_path"/>
+                          <VTooltip activator="parent" location="left">
+                            {{ p?.name }}
+                          </VTooltip>
+                        </VAvatar>
+                      </div>
+                    </div>
+                    <VDivider/>
+                    <div class="px-3 d-flex justify-space-between align-center py-3">
+                      <div>
+                        <h4>
+                          {{ item.category?.name }}
+                        </h4>
+                        <h6>
+                          {{ `${dateConvert(item)} - ${item.time} @ ${item.venue}` }}
+                        </h6>
+                      </div>
+                      <VChip :color="statusColor(item.status)" class="mx-3 mb-1 text-gray-darken-1 text-uppercase">{{ item.status }}</VChip>
+                    </div>
+                  </VCard>
+                </div>
+                <VAlert v-else type="info" color="white" class="mt-30">No Event available to show</VAlert>
+            </VCol>
+          </VRow>
+          <!-- {{selectedDate}} -->
         </div>
-        <VCard class="mx-auto my-2" max-width="600">
+        <VCard class="mx-auto my-2" max-width="800">
           <VTabs v-model="selectedTab">
             <VTab>Events</VTab>
             <VTab>Colleges</VTab>
@@ -483,12 +584,17 @@ const nextMonth = () => {
 .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 1px;
 }
 
 .day {
-  border: 1px solid #ccc;
-  padding: 5px;
+  border: 1px solid #fdfdfd;
+  padding: 3px;
   text-align: center;
+  border-radius: 30px;
+}
+
+.sched-items:nth-child(even){
+  background-color: #f9fff9;
 }
 </style>

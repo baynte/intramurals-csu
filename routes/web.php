@@ -95,3 +95,6 @@ Route::get('/get-selected-date', [ScheduleController::class, 'getSelectedDate'])
 Route::get('/get-dt-events', [ScheduleController::class, 'getDtEvents'])->name('get-dt-events');
 
 Route::get('get-colleges', [ParticipantController::class, 'getParticipantPerYear'])->name('get-colleges');
+Route::get('get-schedule/{date}/date', [ScheduleController::class, 'getSchedPerDate'])->name('get-sched-per-date');
+
+Route::get('get-category-standing-per-college', [ScheduleController::class, 'getCategoriesPerCollege'])->name('get-category-standing-per-college');
