@@ -1,23 +1,33 @@
 <template>
   <div>
     <VSelect v-model="selectedCollege" label="Participant" density="compact" :items="colleges" item-title="name" item-value="id" hide-details></VSelect>
-    <VDataTable :headers="headers"></VDataTable>
+    <VDataTable :headers="headers" :items="computedItems" :loading="processing"></VDataTable>
+    <!-- {{computedItems}} -->
   </div>  
 </template>
 <script setup>
-import { computed, onBeforeMount, ref } from "vue";
+import { computed, onBeforeMount, ref, watch } from "vue";
 const props = defineProps(['categories'])
 const headers = computed(() => {
   return [
-    { title: 'Category', key: 'college' },
-    { title: 'Rank', key: 'wins' },
-    { title: 'Points', key: 'loss' },
+    { title: 'Category', key: 'category' },
+    { title: 'Rank', key: 'rank', align: 'left' },
+    { title: 'Points', key: 'points', align: 'center' },
     // { title: 'Draws', key: 'draws' },
   ]
 })
+const items = ref([])
+const processing = ref(false)
 
 const computedItems = computed(() => {
-
+  if(!items.value.length) return []
+  return items.value.map(function(obj){
+    return {
+      category: obj.name,
+      rank: 'TBA',
+      points: obj.total_contributions
+    }
+  })
 })
 
 const colleges = ref([])
@@ -34,15 +44,25 @@ const getColleges = async() => {
   }
 }
 
+
 const getItems = () => {
+  processing.value = true
   axios.get(route('get-category-standing-per-college', {id: selectedCollege.value}))
   .then((res) => {
+    items.value = res.data
     console.log(res.data)
+  })
+  .finally(() => {
+    processing.value = false
   })
 }
 
+watch(selectedCollege, () => {
+  getItems()
+})
+
 onBeforeMount(() => {
   getColleges()
-  getItems()
+  // getItems()
 })
 </script>

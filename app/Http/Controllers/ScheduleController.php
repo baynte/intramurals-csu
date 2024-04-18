@@ -299,6 +299,22 @@ class ScheduleController extends Controller
 
 
     public function getCategoriesPerCollege(Request $request){
-        info($request);
+        $categ = collect(Category::get());
+        $items = $categ->map(function($obj) use ($request){
+            $total_score = 0;
+            $scheds = collect(Schedule::where('category_id', '=', $obj->id)->get())
+                ->map(function($item){ return $item->id; });
+            if(count($scheds)){
+               collect(SchedParticipant::whereIn('sched_id', $scheds)
+                ->where('participant_id', '=', $request->id)
+                ->get())->reduce(function($carry, $item){
+                    return $carry + $item["contribution_score"];
+                }, 0);
+            }
+            $obj['total_contributions'] = $total_score;
+            return $obj;
+        });
+
+        return $items;
     }
 }
