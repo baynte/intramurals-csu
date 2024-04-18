@@ -22,9 +22,17 @@ const processing = ref(false)
 const computedItems = computed(() => {
   if(!items.value.length) return []
   return items.value.map(function(obj){
+    let rank = 'TBA'
+    switch(obj.rank){
+      case 1: rank = 'CHAMPION'; break;
+      case 2: rank = '1st'; break;
+      case 3: rank = '2nd'; break;
+      case 4: rank = '3rd'; break;
+      case 5: rank = '4th'; break;
+    }
     return {
       category: obj.name,
-      rank: 'TBA',
+      rank,
       points: obj.total_contributions
     }
   })
@@ -50,7 +58,7 @@ const getItems = () => {
   axios.get(route('get-category-standing-per-college', {id: selectedCollege.value}))
   .then((res) => {
     items.value = res.data
-    // console.log(res.data)
+    console.log(res.data)
   })
   .finally(() => {
     processing.value = false

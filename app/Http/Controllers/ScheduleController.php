@@ -312,8 +312,31 @@ class ScheduleController extends Controller
                 ->get())->reduce(function($carry, $item){
                     return $carry + $item["contribution_score"];
                 }, 0);
+               $score_other = collect(SchedParticipant::whereIn('sched_id', $scheds)
+                ->where('participant_id', '!=', $request->id)
+                ->selectRaw('participant_id, SUM(contribution_score) as total_score')
+                ->groupBy('participant_id')
+                ->get())->map(function($obj){
+                    return $obj["total_score"];
+                })->toArray();
+
+                $filteredArray = array_filter($score_other, function ($value) {
+                    return $value !== null;
+                });
+                $filteredArray[] = $total_score;
+                $filteredArray = array_unique($filteredArray);
+                rsort($filteredArray);
+                
+                // Find the rank of $total in the sorted array
+                $rank = array_search($total_score, $filteredArray);
+                
+                // Adjust rank by adding 1 since array_search returns a zero-based index
+                if ($rank !== false) {
+                    $rank += 1;
+                }
             }
             $obj['total_contributions'] = $total_score;
+            $obj['rank'] = $total_score ? $rank : "TBA";
             return $obj;
         });
 
