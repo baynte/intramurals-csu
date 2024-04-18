@@ -52,6 +52,7 @@ const getItems = (process) => {
 }
 
 onBeforeMount(() => {
+  getItems(true)
   setInterval(() => {
     getItems(false)
   }, 4000)

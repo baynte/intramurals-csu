@@ -4,6 +4,13 @@ import { ref, computed } from 'vue';
     'item'
   ])
 
+  const emits = defineEmits([
+    'toggleEdit'
+  ])
+
+  const edit = (item) => {
+    emits('toggleEdit', item)
+  }
   const show = ref(false)
 </script>
 <template>
@@ -23,6 +30,7 @@ import { ref, computed } from 'vue';
       <v-btn
         color="green"
         variant="tonal"
+        @click="edit(item)"
       >
         edit
       </v-btn>

@@ -70,6 +70,10 @@ const getItems = () => {
 }
 
 getItems()
+
+const editItem = (item) => {
+  console.log(item)
+}
 </script>
 <template>
   <Admin>
@@ -153,7 +157,7 @@ getItems()
     <div v-else class="pa-3">
       <VRow v-if="items.length">
         <VCol v-for="item in items" :key="item.id" cols="4">
-          <RubrickComponent :item="item"/>
+          <RubrickComponent :item="item" @toggle-edit="editItem"/>
         </VCol>
       </VRow>
       <VAlert v-else type="warning" variant="outlined">
