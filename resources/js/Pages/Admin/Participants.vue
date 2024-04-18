@@ -55,9 +55,9 @@ const editForm = (item) => {
   showForm.value = true
 }
 
-const removeItem = (category) => {
-  items.value = items.value.filter(x => x.id != category)
-  axios.delete(route('admin.participant.destroy', {category}))
+const removeItem = (participant) => {
+  items.value = items.value.filter(x => x.id != participant)
+  axios.delete(route('admin.participant.destroy', {participant}))
 }
 
 const toggleForm = () => {
