@@ -92,9 +92,11 @@ class ScheduleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Schedule $schedule)
+    public function destroy($id)
     {
-        //
+        $sched = Schedule::find($id);
+        $sched->delete();
+        return response()->json(['msg' => 'successfully removed']);
     }
 
     public function editStanding(Request $request){

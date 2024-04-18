@@ -229,6 +229,11 @@ onBeforeMount(()=> {
 watch(() => form.year, () => {
   getItems()
 })
+
+const removeItem = (schedule) => {
+  items.value = items.value.filter(x => x.id != schedule)
+  axios.delete(route('admin.schedule.destroy', {schedule}))
+}
 </script>
 <template>
   <Admin>
@@ -307,9 +312,20 @@ watch(() => form.year, () => {
                 <VBtn @click="toggleEdit(item.id)" icon color="yellow-darken-3" variant="text" size="sm">
                   <VIcon>mdi-pencil</VIcon>
                 </VBtn>
-                <VBtn icon color="red-darken-3" variant="text" size="sm">
-                  <VIcon>mdi-delete</VIcon>
-                </VBtn>
+                <v-menu transition="scale-transition">
+                  <template v-slot:activator="{ props }">
+                    <VBtn v-bind="props" icon color="red-darken-3" variant="text" size="sm">
+                      <VIcon>mdi-delete</VIcon>
+                    </VBtn>
+                  </template>
+                  <v-card title="System Warning" subtitle="are you sure?">
+                    <VCardActions>
+                      <VBtn variant="outlined">No</VBtn>
+                      <VSpacer></VSpacer>
+                      <VBtn color="red" @click="removeItem(item.id)" variant="flat">Yes</VBtn>
+                    </VCardActions>
+                  </v-card>
+                </v-menu>
               </div>
             </template>
             <template v-slot:[`item.edit_standing`]="{ item }">
