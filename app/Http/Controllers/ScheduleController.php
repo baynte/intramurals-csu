@@ -305,7 +305,7 @@ class ScheduleController extends Controller
             $scheds = collect(Schedule::where('category_id', '=', $obj->id)->get())
                 ->map(function($item){ return $item->id; });
             if(count($scheds)){
-               collect(SchedParticipant::whereIn('sched_id', $scheds)
+               $total_score = collect(SchedParticipant::whereIn('sched_id', $scheds)
                 ->where('participant_id', '=', $request->id)
                 ->get())->reduce(function($carry, $item){
                     return $carry + $item["contribution_score"];
