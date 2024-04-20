@@ -301,7 +301,7 @@ class ScheduleController extends Controller
 
     public function getOverall(){
         $p = collect(SchedParticipant::with('info')
-            ->whereNotNull('contribution_score')
+            // ->whereNotNull('contribution_score')
             ->selectRaw('participant_id, SUM(contribution_score) as total_score')
             ->groupBy('participant_id')
             ->get())->map(function($obj){
