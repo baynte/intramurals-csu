@@ -7,6 +7,7 @@ import { ref, computed } from 'vue';
 const year_items = ["2024"]
 const showForm = ref(false)
 const toggleCreateForm = () => {
+  form.reset()
   showForm.value = true
 }
 
@@ -18,7 +19,11 @@ const form = useForm({
 })
 const category_t = ref("")
 const pushCategoryToForm = () => {
-  form.categories.push(category_t.value)
+  if(form.id){
+    form.categories.push({id: null, value: category_t.value})
+  }else{
+    form.categories.push(category_t.value)
+  }
   category_t.value = ""
 }
 
@@ -30,11 +35,15 @@ const canSubmit = computed(() => {
 const category_u = ref("")
 const categ_edit_index = ref(null)
 const updateCateg = () => {
-  form.categories[categ_edit_index.value] = category_u.value
+  if(form.id){
+    form.categories[categ_edit_index.value].value = category_u.value
+  }else{
+    form.categories[categ_edit_index.value] = category_u.value
+  }
   closeUpdate()
 }
 const initCateg = (index, item) => {
-  category_u.value = item
+  category_u.value = form.id ? item.value : item
   categ_edit_index.value = index
 }
 
@@ -48,12 +57,22 @@ const removeFromCateg = (index_p) => {
 }
 
 const submitForm = () => {
-  form.post(route('admin.rubrick.store'), {
-    onSuccess: () => {
-      form.reset()
-      getItems()
-    }
-  })
+  if(form.id){
+    form.put(route('admin.rubrick.update', {rubrick: form.id}), {
+      onSuccess: () => {
+        showForm.value = false
+        form.reset()
+        getItems()
+      }
+    })
+  }else{
+    form.post(route('admin.rubrick.store'), {
+      onSuccess: () => {
+        form.reset()
+        getItems()
+      }
+    })
+  }
 }
 
 const itemsProcessing = ref(false)
@@ -72,7 +91,18 @@ const getItems = () => {
 getItems()
 
 const editItem = (item) => {
-  console.log(item)
+  form.id = item.id
+  form.title = item.title
+  form.categories = item.insights
+  showForm.value = true
+}
+
+const removeItem = (item) => {
+  form.delete(route('admin.rubrick.destroy', { rubrick: item.id }), {
+    onSuccess: () => {
+      getItems()
+    }
+  })
 }
 </script>
 <template>
@@ -88,7 +118,7 @@ const editItem = (item) => {
       <VBtn @click="toggleCreateForm" variant="tonal">Create</VBtn>
     </template>
     <VDialog v-model="showForm" max-width="600" scrollable persistent>
-      <VCard :title="`Form`" subtitle="please provide informations.">
+      <VCard :title="form.id ? `(Edit) Form`: `Form`" subtitle="please provide informations.">
         <VDivider/>
         <VCardText>
           <VTextField v-model="form.title" label="Title" hide-details/>
@@ -105,32 +135,62 @@ const editItem = (item) => {
             <VListSubheader>
               Added Key Insights
             </VListSubheader>
-            <VListItem v-for="item, index in form.categories" :key="`categ-${index}`" class="list">
-              <p v-if="categ_edit_index !== index">{{ item }}</p>
-              <VTextField v-else  hide-details density="compact" v-model="category_u">
-                <template v-slot:append>
-                    <VBtn @click="updateCateg" icon variant="tonal" color="blue" size="small" class="ml-1">
-                      <VIcon>mdi-check</VIcon>
-                    </VBtn>
-                </template>
-                <template v-slot:append-inner>
-                    <VBtn @click="closeUpdate" icon variant="text" size="small" class="ml-1">
-                      <VIcon>mdi-close</VIcon>
-                    </VBtn>
-                </template>
+            <div v-if="form.id == null">
+              <VListItem v-for="item, index in form.categories" :key="`categ-${index}`" class="list">
+                <p v-if="categ_edit_index !== index">{{ item }}</p>
+                <VTextField v-else  hide-details density="compact" v-model="category_u">
+                  <template v-slot:append>
+                      <VBtn @click="updateCateg" icon variant="tonal" color="blue" size="small" class="ml-1">
+                        <VIcon>mdi-check</VIcon>
+                      </VBtn>
+                  </template>
+                  <template v-slot:append-inner>
+                      <VBtn @click="closeUpdate" icon variant="text" size="small" class="ml-1">
+                        <VIcon>mdi-close</VIcon>
+                      </VBtn>
+                  </template>
 
-              </VTextField>
-              <template v-slot:append>
-                <VBtn v-if="index !== categ_edit_index" 
-                  @click="initCateg(index, item)"
-                  icon variant="outlined" size="small">
-                  <VIcon>mdi-pencil</VIcon>
-                </VBtn>
-                <VBtn v-if="index !== categ_edit_index" @click="removeFromCateg(index)" icon variant="outlined" size="small" class="ml-1">
-                  <VIcon>mdi-delete</VIcon>
-                </VBtn>
-              </template>
-            </VListItem>
+                </VTextField>
+                <template v-slot:append>
+                  <VBtn v-if="index !== categ_edit_index" 
+                    @click="initCateg(index, item)"
+                    icon variant="outlined" size="small">
+                    <VIcon>mdi-pencil</VIcon>
+                  </VBtn>
+                  <VBtn v-if="index !== categ_edit_index" @click="removeFromCateg(index)" icon variant="outlined" size="small" class="ml-1">
+                    <VIcon>mdi-delete</VIcon>
+                  </VBtn>
+                </template>
+              </VListItem>
+            </div>
+            <div v-else>
+              <VListItem v-for="item, index in form.categories" :key="`categ-${index}`" class="list">
+                <p v-if="categ_edit_index !== index">{{ item.value }}</p>
+                <VTextField v-else  hide-details density="compact" v-model="category_u">
+                  <template v-slot:append>
+                      <VBtn @click="updateCateg" icon variant="tonal" color="blue" size="small" class="ml-1">
+                        <VIcon>mdi-check</VIcon>
+                      </VBtn>
+                  </template>
+                  <template v-slot:append-inner>
+                      <VBtn @click="closeUpdate" icon variant="text" size="small" class="ml-1">
+                        <VIcon>mdi-close</VIcon>
+                      </VBtn>
+                  </template>
+
+                </VTextField>
+                <template v-slot:append>
+                  <VBtn v-if="index !== categ_edit_index" 
+                    @click="initCateg(index, item)"
+                    icon variant="outlined" size="small">
+                    <VIcon>mdi-pencil</VIcon>
+                  </VBtn>
+                  <VBtn v-if="index !== categ_edit_index" @click="removeFromCateg(index)" icon variant="outlined" size="small" class="ml-1">
+                    <VIcon>mdi-delete</VIcon>
+                  </VBtn>
+                </template>
+              </VListItem>
+            </div>
           </VList>
         </VCardText>
         <VDivider></VDivider>
@@ -139,7 +199,7 @@ const editItem = (item) => {
           <VSpacer/>
           <h3 v-if="form.recentlySuccessful">Success!</h3>
           <VSpacer/>
-          <VBtn color="green" variant="flat" :disabled="!canSubmit" :loading="form.processing" @click="submitForm">Submit</VBtn>
+          <VBtn color="green" variant="flat" :disabled="!canSubmit" :loading="form.processing" @click="submitForm">{{form.id ? 'Update' : `Submit`}}</VBtn>
         </VCardActions>
       </VCard>
     </VDialog>
@@ -157,7 +217,7 @@ const editItem = (item) => {
     <div v-else class="pa-3">
       <VRow v-if="items.length">
         <VCol v-for="item in items" :key="item.id" cols="4">
-          <RubrickComponent :item="item" @toggle-edit="editItem"/>
+          <RubrickComponent :item="item" @toggle-edit="editItem" @remove-item="removeItem"/>
         </VCol>
       </VRow>
       <VAlert v-else type="warning" variant="outlined">

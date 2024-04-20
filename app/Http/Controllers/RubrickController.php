@@ -50,17 +50,49 @@ class RubrickController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Rubrick $rubrick)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $rub = Rubrick::findOrFail($id);
+        $rub->title = $request->title;
+        $rub->save();
+        
+        $ids = collect($request->categories)
+        ->filter(function($obj){
+            return $obj['id'];
+        })
+        ->map(function($obj){
+            return $obj['id'];
+        });
 
+        // delete
+        RubrickInsight::where('rubrick_id', '=', $rub->id)
+        ->whereNotIn('id', $ids)
+        ->delete();
+        
+        foreach($request->categories as $item){
+            if($item['id']){
+                $ins = RubrickInsight::find($item['id']);
+                $ins->value = $item['value'];
+                $ins->save();
+            }else{
+                RubrickInsight::create([
+                    'rubrick_id' => $rub->id,
+                    'value' => $item['value']
+                ]);
+            }
+        }
+        
+        return redirect()->back();
+    }
+    
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Rubrick $rubrick)
+    public function destroy($id)
     {
-        //
+        $rub = Rubrick::findOrFail($id);
+        $rub->delete();
+        return redirect()->back();
     }
 
     public function updateRubrickType($id, Request $request){

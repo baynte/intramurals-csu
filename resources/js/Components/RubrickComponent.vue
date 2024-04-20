@@ -5,11 +5,15 @@ import { ref, computed } from 'vue';
   ])
 
   const emits = defineEmits([
-    'toggleEdit'
+    'toggleEdit', 'removeItem'
   ])
 
   const edit = (item) => {
     emits('toggleEdit', item)
+  }
+
+  const removeItem = (item) => {
+    emits('removeItem', item)
   }
   const show = ref(false)
 </script>
@@ -27,6 +31,20 @@ import { ref, computed } from 'vue';
       No Insights Added
       </v-btn>
       <v-spacer></v-spacer>
+      <v-menu transition="scale-transition">
+        <template v-slot:activator="{ props }">
+          <VBtn v-bind="props" color="red-darken-3" variant="text">
+            <VIcon>mdi-delete</VIcon>
+          </VBtn>
+        </template>
+        <v-card title="System Warning" subtitle="are you sure?">
+          <VCardActions>
+            <VBtn variant="outlined">No</VBtn>
+            <VSpacer></VSpacer>
+            <VBtn color="red" @click="removeItem(item)" variant="flat">Yes</VBtn>
+          </VCardActions>
+        </v-card>
+      </v-menu>
       <v-btn
         color="green"
         variant="tonal"
