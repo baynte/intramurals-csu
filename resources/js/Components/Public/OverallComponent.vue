@@ -32,7 +32,7 @@ const computedItems = computed(() => {
     }
     return {
       college: obj.name,
-      rank,
+      rank: obj.total_points ? rank : 'Unranked',
       points: obj.total_points
     }
   })

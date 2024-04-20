@@ -302,6 +302,10 @@ class ScheduleController extends Controller
     public function getOverall(){
         $p = collect(SchedParticipant::with('info')
             // ->whereNotNull('contribution_score')
+            ->leftJoin('participants as p', function($join){
+                $join->on('sched_participants.participant_id', '=', 'p.id');
+            })
+            ->whereNull('p.deleted_at')
             ->selectRaw('participant_id, SUM(contribution_score) as total_score')
             ->groupBy('participant_id')
             ->get())->map(function($obj){
