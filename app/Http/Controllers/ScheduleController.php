@@ -359,4 +359,12 @@ class ScheduleController extends Controller
 
         return $items;
     }
+
+
+    public function getStandingDashboard(Request $request){
+        return RubrickEvaluation::leftJoin('rubrick_insights as ri', function($join){
+            $join->on('rubrick_evaluations.insight_id', '=', 'ri.id');
+        })->whereNull('ri.deleted_at')
+        ->where('sched_id', '=', $request->id)->get();
+    }
 }

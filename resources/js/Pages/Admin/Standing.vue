@@ -1,7 +1,7 @@
 <script setup>
 // import Public from '@/Layouts/Public.vue';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import StandingVue from '@/Components/StandingComponent.vue'
 import _ from 'lodash';
 
@@ -77,17 +77,6 @@ const convertLink = (sched_id, auth_id) => {
 }
 
 
-// const submitUpdateContriScore = _.debounce(function(id, score){
-//   axios({
-//     url: route('admin.update-score-contribution'),
-//     method: 'PUT',
-//     data: {
-//       id, score
-//     }
-//   })
-//   console.log(id, score)
-// }, 300)
-
 const submitUpdateContriScore = (id, score) => {
     axios({
       url: route('admin.update-score-contribution'),
@@ -110,6 +99,60 @@ watch(() => props.sched.status, (newVal, oldVal) => {
       return {...x, contribution_score: null}
     }) 
   }
+})
+
+const evaluations = ref([])
+
+const rub = computed(() => {
+  return props.rubricks.find(function(obj){
+    return obj.id === props.sched.rubrick_id
+  })?.insights
+  .map(function(obj){
+    return {
+      key: `${obj.id}`,
+      title: obj.value,
+      align: 'center',
+    }
+  })
+})
+const headers = computed(() => {
+  return [
+    { title: "College", key: 'college', align: 'center' },
+    ...rub.value,
+  ]
+})
+
+const computedDashboard = computed(() => {
+  if(!evaluations.value.length) return []
+  return props.participants.map(function(obj){
+    const newObj = {}
+    newObj['college'] = obj.name
+    rub.value.forEach(function(rub_obj){
+      const filtered = evaluations.value.filter(function(x){
+        return `${x.insight_id}` == rub_obj.key && obj.id == x.participant_id
+      })
+      const sum = filtered.reduce((acc, curr) => acc + parseFloat(curr.eval_score), 0)
+      const average = sum / filtered.length;
+      newObj[rub_obj.key] = average || 0
+      newObj['sum'] = sum || 0
+      newObj['items'] = filtered
+    })
+    return newObj
+  })
+})
+
+const getDashboard = () => {
+  axios.get(route('admin.get-standing-dashboard', {id: props.sched?.id}))
+  .then((res) => {
+    evaluations.value = res.data
+  })
+}
+
+onBeforeMount(() => {
+  getDashboard()
+  setInterval(() => {
+    getDashboard()
+  }, 3000)
 })
 </script>
 <template>
@@ -198,7 +241,11 @@ watch(() => props.sched.status, (newVal, oldVal) => {
           </VCol>
           <VCol cols="8">
             <VCard title="Scoring Dashboard" subtitle="This will be the section on where should the updating of score">
-              <VDivider/>
+              <div v-if="rubrickId">
+                <!-- {{ computedDashboard }} -->
+                <VDataTable :headers="headers" items-per-page="-1" :items="computedDashboard"></VDataTable>
+              </div>
+              <VDivider v-else class="mb-2"/>
               <StandingVue :participants="participants" :category="category" :sched="sched" :rubricks="rubricks" />
             </VCard>
           </VCol>

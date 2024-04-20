@@ -76,6 +76,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::put('update-rubrick-type/{id}/sched', [RubrickController::class, 'updateRubrickType'])->name('update-rubrick-type');
 
     Route::put('/update-score-contribution', [ScheduleController::class, 'updateScoreContribution'])->name('update-score-contribution');
+
+    Route::get('get-standing-dashboard', [ScheduleController::class, 'getStandingDashboard'])->name('get-standing-dashboard');
 });
 
 Route::get('/link/schedule/standing', [ScheduleController::class, 'privateStanding'])->name('link.schedule.standing');

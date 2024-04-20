@@ -99,9 +99,10 @@ const toggleEdit = (id) => {
 
 const items = ref([])
 const itemsProcessing = ref(false)
-const getItems = async() =>{
+const getItems = async(process = true) =>{
   try {
-    itemsProcessing.value = true
+    // console.log(process)
+    itemsProcessing.value = process
     const res = await axios.get(route('admin.schedule.index', {year: form.year}))
     items.value = res.data
   } catch (error) {
@@ -224,6 +225,10 @@ const editStanding = (id) => {
 onBeforeMount(()=> {
   getAssets()
   getItems()
+
+  setInterval(() => {
+    getItems(false)
+  }, 3000)
 })
 
 watch(() => form.year, () => {

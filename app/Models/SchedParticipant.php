@@ -28,6 +28,10 @@ class SchedParticipant extends Model
                 return -1;
             }
             return number_format(collect(RubrickEvaluation::where('sched_id', '=', $this->sched_id)
+            ->leftJoin('rubrick_insights as ri', function($join){
+                $join->on('ri.id', '=', 'rubrick_evaluations.insight_id');
+            })
+            ->whereNull('ri.deleted_at')
             ->where('participant_id', '=', $this->participant_id)
             ->get())
             ->map(function($obj){
