@@ -143,7 +143,7 @@ const submitForm = () => {
           <VListSubheader>Rubrick Items:</VListSubheader>
           <VListItem v-for="item, index in insights_form" :key="`categ-${index}`" class="list mb-2">
             <p>{{ `${index+1}. ${item.text}` }}</p>
-            <VTextField v-model.number="item.score" type="number" min="0" hide-details variant="underlined" density="compact" class="px-5"/>
+            <VTextField v-model.number="item.score" :disabled="author ? false : true" type="number" min="0" hide-details variant="underlined" density="compact" class="px-5"/>
           </VListItem>
         </div>
         <VBtn @click="showPrompt = true" block color="green" class="my-3" :disabled="form.participant_id ? false : true">Submit</VBtn>

@@ -26,11 +26,11 @@ use Inertia\Inertia;
 Route::get('/', function () {
     $today = now()->format('Y-m-d');
     $tomorrow = now()->addDays(1)->format('Y-m-d');
-    $today_items = Schedule::with(['participants_info', 'category'])
+    $today_items = Schedule::with(['participants_info', 'category', 'participants'])
         ->whereDate('date_from', '=', $today)
         ->orWhereDate('date_to', '=', $today)
         ->get();
-    $tomorrow_items = Schedule::with(['participants_info', 'category'])
+    $tomorrow_items = Schedule::with(['participants_info', 'category', 'participants'])
         ->whereDate('date_from', '=', $tomorrow)
         ->orWhereDate('date_to', '=', $tomorrow)
         ->get();

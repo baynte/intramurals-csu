@@ -343,7 +343,7 @@ onMounted(() => {
                   </section>
                   <div style="overflow-x: auto" class="d-flex">
                     <section v-for="item in today_scheds" :key="item.id" variant="flat" style="" class="sched-items d-flex flex-column">
-                      <div class="flex-grow-1">
+                      <div class="flex-grow-1 mb-2">
                         <div class="px-3 py-3 text-center">
                           <h4>
                             {{ item.category?.name }}
@@ -355,22 +355,23 @@ onMounted(() => {
                             {{ item.class_type}}
                           </h6>
                         </div>
-                        <div v-if="item.participants_info.length == 2" class="d-flex justify-center align-center">
+                        <div v-if="item.participants_info.length == 2" class="d-flex justify-center align-center px-2">
                           <VAvatar>
-                            <VImg :src="item.participants_info[0].avatar_path"/>
+                            <VImg :src="item.participants_info[0].avatar_path" color="green"/>
                             <VTooltip activator="parent" location="start">
                               {{ item.participants_info[0]?.name }}
                             </VTooltip>
                           </VAvatar>
+                          {{item}}
                           <h3 class="mx-2">VS</h3>
                           <VAvatar>
-                            <VImg :src="item.participants_info[1].avatar_path"/>
+                            <VImg :src="item.participants_info[1].avatar_path" color="green"/>
                             <VTooltip activator="parent" location="end">
                               {{ item.participants_info[1]?.name }}
                             </VTooltip>
                           </VAvatar>
                         </div>
-                        <div v-else class="d-flex">
+                        <div v-else class="d-flex justify-center">
                           <VAvatar color="green" v-for="p in item.participants_info" :key="p.id" class="mx-1">
                             <VImg :src="p.avatar_path"/>
                             <VTooltip activator="parent" location="left">
@@ -379,10 +380,10 @@ onMounted(() => {
                           </VAvatar>
                         </div>
                       </div>
-                      <div v-if="item.status != 'on-going'" class="text-center primary py-2 font-weight-bold">
+                      <div v-if="item.status == 'pending'" class="text-center primary py-2 font-weight-bold">
                         {{ `${item.time}` }}
                       </div>
-                      <div v-else class="bg-s py-2 text-white text-center">ON-GOING</div>
+                      <div v-else class="bg-s py-2 text-white text-center text-uppercase" style=" border-left: 1px solid white;">{{item.status}}</div>
                     </section>
                   </div>
                 </VCard>

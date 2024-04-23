@@ -4,7 +4,8 @@ import { computed } from 'vue'
 
 const form = useForm({
   email: "",
-  password: ""
+  password: "",
+  rembember: false
 })
 const submitForm = () => {
   form.post(route('login.authenticate'))
