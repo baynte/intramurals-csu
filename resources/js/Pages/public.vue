@@ -362,7 +362,7 @@ onMounted(() => {
                               {{ item.participants_info[0]?.name }}
                             </VTooltip>
                           </VAvatar>
-                          {{item}}
+                          <!-- {{item}} -->
                           <h3 class="mx-2">VS</h3>
                           <VAvatar>
                             <VImg :src="item.participants_info[1].avatar_path" color="green"/>
