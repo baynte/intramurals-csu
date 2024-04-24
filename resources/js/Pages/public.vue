@@ -476,7 +476,7 @@ onMounted(() => {
             :continuous="false"
             :show-arrows="true"
             delimiter-icon="mdi-square"
-            hide-delimiter-background
+            hide-delimiters
             class="mt-3"
             cycle
           >
