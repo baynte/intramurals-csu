@@ -6,6 +6,7 @@
   </div>  
 </template>
 <script setup>
+import _ from 'lodash'
 import { computed, onBeforeMount, ref, watch } from "vue";
 const props = defineProps(['categories'])
 const headers = computed(() => {
@@ -21,7 +22,9 @@ const processing = ref(false)
 
 const computedItems = computed(() => {
   if(!items.value.length) return []
-  return items.value.map(function(obj, index){
+  const items_l = _.orderBy(items.value, ['total_points'], ['desc'])
+  return items_l
+  .map(function(obj, index){
     let rank = 'TBA'
     switch(index + 1){
       case 1: rank = 'CHAMPION'; break;
