@@ -310,7 +310,7 @@ class ScheduleController extends Controller
             ->groupBy('participant_id')
             ->get())->map(function($obj){
                 $item = $obj['info'];
-                $item['total_points'] = $obj['total_score'];
+                $item['total_points'] = intval($obj['total_score']);
                 return $item;
             })->sortByDesc('total_score');
         return $p;
