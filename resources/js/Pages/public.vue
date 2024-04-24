@@ -15,7 +15,7 @@ const changePhoto = () => {
 
 setInterval(changePhoto, 3000);
 const props = defineProps([
-  'today_scheds', 'tomorrow_scheds', 'categories'
+  'today_scheds', 'tomorrow_scheds', 'categories', 'posts'
 ]);
 
 const today_scheds = ref([])
@@ -470,6 +470,28 @@ onMounted(() => {
               </VCol>
             </VRow>
           </div>
+        </div>
+        <div style="max-width:800px;" class="mx-auto">
+          <VCarousel
+            :continuous="false"
+            :show-arrows="true"
+            delimiter-icon="mdi-square"
+            hide-delimiter-background
+            class="mt-3"
+            cycle
+          >
+            <VCarouselItem v-for="post in posts" :key="post.id">
+              <div style="position: relative;">
+                <VImg :src="post.bg_path">
+                  <div class="text-white px-5 py-3">
+                    <h3>{{post.name}}</h3>
+                    <h4>{{post.description}}</h4>
+                  </div>
+                </VImg>
+                
+              </div>
+            </VCarouselItem>
+          </VCarousel>
         </div>
         <div class="mx-auto mt-4 mb-5" style="width: 800px">
           <VRow>

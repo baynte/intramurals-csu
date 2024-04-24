@@ -8,6 +8,7 @@ use App\Http\Controllers\RubrickController;
 use App\Http\Controllers\SchedAuthorController;
 use App\Http\Controllers\ScheduleController;
 use App\Models\Category;
+use App\Models\Post;
 use App\Models\SchedAuthor;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\Route;
@@ -44,10 +45,13 @@ Route::get('/', function () {
         ->orWhereDate('date_to', '=', $tomorrow)
         ->get();
 
+    $ann = Post::get();
+
     return Inertia::render('public', [
         'today_scheds' => $today_items,
         'tomorrow_scheds' => $tomorrow_items,
-        'categories' => Category::get()
+        'categories' => Category::get(),
+        'posts' => $ann
     ]);
 })->name('public');
 
@@ -65,10 +69,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
         return Inertia::render('Admin/Rubricks');
     })->name('rubricks');
 
+    Route::get('/posts', function(){
+        return Inertia::render('Admin/Posts');
+    })->name('posts');
+
 
     //Resources
     Route::apiResource('category', CategoryController::class);
-    Route::apiResource('post', PostController::class);
+
+    Route::apiResource('post', PostController::class)->names('post');
+    Route::post('/post/img/bg', [PostController::class, 'BgUpdate'])->name('post.img.bg');
     
     Route::apiResource('participant', ParticipantController::class);
     Route::post('/participant/img/avatar', [ParticipantController::class, 'AvatarUpdate'])->name('participant.img.avatar');
