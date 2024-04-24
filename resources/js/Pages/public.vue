@@ -471,7 +471,7 @@ onMounted(() => {
             </VRow>
           </div>
         </div>
-        <div style="max-width:800px;" class="mx-auto">
+        <div style="max-width:800px;" class="mx-auto" v-if="posts.length">
           <VCarousel
             :continuous="false"
             :show-arrows="true"
