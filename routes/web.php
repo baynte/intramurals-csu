@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\RubrickController;
 use App\Http\Controllers\SchedAuthorController;
 use App\Http\Controllers\ScheduleController;
@@ -22,6 +23,14 @@ use Inertia\Inertia;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/scheds-today', function(){
+    $today = now()->format('Y-m-d');
+    return Schedule::with(['participants_info', 'category', 'participants'])
+        ->whereDate('date_from', '=', $today)
+        ->orWhereDate('date_to', '=', $today)
+        ->get();
+})->name('scheds-today');
 
 Route::get('/', function () {
     $today = now()->format('Y-m-d');
@@ -59,6 +68,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     //Resources
     Route::apiResource('category', CategoryController::class);
+    Route::apiResource('post', PostController::class);
     
     Route::apiResource('participant', ParticipantController::class);
     Route::post('/participant/img/avatar', [ParticipantController::class, 'AvatarUpdate'])->name('participant.img.avatar');

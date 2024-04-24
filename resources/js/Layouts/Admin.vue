@@ -6,6 +6,7 @@
     { title: "Participants", active: route().current('admin.participants'), url: route('admin.participants'), icon: "mdi-account-group-outline" },
     { title: "Categories", active: route().current('admin.categories'), url: route('admin.categories'), icon: "mdi-shape-outline" },
     { title: "Rubricks", active: route().current('admin.rubricks'), url: route('admin.rubricks'), icon: "mdi-puzzle-outline" },
+    { title: "Announcements", active: route().current('admin.post.index'), url: route('admin.post.index'), icon: "mdi-bullhorn-variant-outline" },
   ]
 
   const showNavBar = ref(true)

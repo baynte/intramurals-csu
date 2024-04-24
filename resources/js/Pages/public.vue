@@ -18,6 +18,12 @@ const props = defineProps([
   'today_scheds', 'tomorrow_scheds', 'categories'
 ]);
 
+const today_scheds = ref([])
+const tomorrow_scheds = ref([])
+
+today_scheds.value = props.today_scheds
+tomorrow_scheds.value = props.tomorrow_scheds
+
 const dateConvert = ({date_from, date_to}) => {
   if(date_from == date_to){
     return moment(date_from, 'YYYY-MM-DD').format('MMMM DD, YYYY')
@@ -111,6 +117,13 @@ const getSelectedDateSched = () => {
   })
 }
 
+const getSchedsToday = () => {
+  axios.get(route('scheds-today'))
+  .then(res => {
+    today_scheds.value = res.data
+  })
+}
+
 watch(selectedDate, () => {
   getSelectedDateSched()
 })
@@ -118,6 +131,9 @@ watch(selectedDate, () => {
 onMounted(() => {
   getSelectedDatePreview()
   getSelectedDateSched()
+  setInterval(() => {
+    getSchedsToday()
+  }, 3000)
 })
 </script>
 <template>
@@ -356,20 +372,29 @@ onMounted(() => {
                           </h6>
                         </div>
                         <div v-if="item.participants_info.length == 2" class="d-flex justify-center align-center px-2">
-                          <VAvatar>
-                            <VImg :src="item.participants_info[0].avatar_path" color="green"/>
-                            <VTooltip activator="parent" location="start">
-                              {{ item.participants_info[0]?.name }}
-                            </VTooltip>
-                          </VAvatar>
-                          <!-- {{item}} -->
-                          <h3 class="mx-2">VS</h3>
-                          <VAvatar>
-                            <VImg :src="item.participants_info[1].avatar_path" color="green"/>
-                            <VTooltip activator="parent" location="end">
-                              {{ item.participants_info[1]?.name }}
-                            </VTooltip>
-                          </VAvatar>
+                          <div class="text-center">
+                            <VAvatar>
+                              <VImg :src="item.participants_info[0].avatar_path" color="green"/>
+                              <VTooltip activator="parent" location="start">
+                                {{ item.participants_info[0]?.name }}
+                              </VTooltip>
+                            </VAvatar>
+                            <p v-if="item.status != 'pending'">
+                              {{Math.floor(item.participants[0].rubrick_score)}}
+                            </p>
+                          </div>
+                          <h3 class="mx-3">VS</h3>
+                          <div class="text-center">
+                            <VAvatar>
+                              <VImg :src="item.participants_info[1].avatar_path" color="green"/>
+                              <VTooltip activator="parent" location="start">
+                                {{ item.participants_info[1]?.name }}
+                              </VTooltip>
+                            </VAvatar>
+                            <p v-if="item.status != 'pending'">
+                              {{Math.floor(item.participants[1].rubrick_score)}}
+                            </p>
+                          </div>
                         </div>
                         <div v-else class="d-flex justify-center">
                           <VAvatar color="green" v-for="p in item.participants_info" :key="p.id" class="mx-1">
@@ -596,6 +621,6 @@ onMounted(() => {
 }
 
 .sched-items:nth-child(even){
-  background-color: #f9fff9;
+  background-color: #fefffe;
 }
 </style>
