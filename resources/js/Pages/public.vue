@@ -487,7 +487,7 @@ const redirectToLogin = () => {
             <VCarouselItem v-for="post in posts" :key="post.id">
               <div style="position: relative;">
                 <VImg :src="post.bg_path">
-                  <div class="text-white px-5 py-3">
+                  <div class="text-white px-5 py-3 bg-p" style="opacity: .8">
                     <h3>{{post.name}}</h3>
                     <h4>{{post.description}}</h4>
                   </div>
