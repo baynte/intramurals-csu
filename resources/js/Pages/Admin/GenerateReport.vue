@@ -100,7 +100,7 @@ onBeforeMount(() => {
         </VCol>
         <VCol cols="12">
             <VList>
-                <h1>Team Standing</h1>
+                <h1>Overall Standing</h1>
                 <VListItem v-for="item in computedItems" :title="item.college" :subtitle="item.rank" class="mb-2 list">
                     <template v-slot:append>
                         <span style="font-size: 1.5rem; font-weight: bold;">{{ item.points }}</span>
