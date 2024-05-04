@@ -35,6 +35,9 @@ class LoginController extends Controller
     }
 
     public function login(){
+        if(Auth::check()){
+            return redirect()->intended('/admin');
+        }
       return Inertia::render('Admin/Auth/Login');
     }
 
