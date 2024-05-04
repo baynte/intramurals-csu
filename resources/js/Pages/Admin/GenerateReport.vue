@@ -77,7 +77,7 @@ onBeforeMount(() => {
                 <template v-slot:append>
                 </template>
                 <VCardText class="text-center">
-                    <span style="font-size: 4.5rem; font-weight: bold;">{{ items.length }}</span>
+                    <span style="font-size: 4.5rem; font-weight: bold;">{{ total_items.length }}</span>
                 </VCardText>
             </VCard>
         </VCol>
