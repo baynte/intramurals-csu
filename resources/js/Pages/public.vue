@@ -1,6 +1,6 @@
 <script setup>
 import Public from '@/Layouts/Public.vue';
-import { Head } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { onMounted, ref, watch, computed } from 'vue';
 import moment from 'moment';
 import EventComponentVue from '@/Components/Public/EventComponent.vue';
@@ -135,6 +135,10 @@ onMounted(() => {
     getSchedsToday()
   }, 3000)
 })
+
+const redirectToLogin = () => {
+  router.visit(route('login'))
+}
 </script>
 <template>
   <Public>
@@ -598,6 +602,9 @@ onMounted(() => {
           </VWindow>
         </VCard>
       </div>
+      <v-btn @click="redirectToLogin" style="position: fixed; top: 10px; right: 10px; z-index: 50;" color="green">
+        Login
+      </v-btn>
     </div>
   </Public>
 </template>

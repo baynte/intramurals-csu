@@ -73,6 +73,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
         return Inertia::render('Admin/Posts');
     })->name('posts');
 
+    Route::get('generate-report', [ScheduleController::class, 'generateReport'])->name('generate-report');
+
 
     //Resources
     Route::apiResource('category', CategoryController::class);

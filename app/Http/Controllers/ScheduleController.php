@@ -367,4 +367,15 @@ class ScheduleController extends Controller
         })->whereNull('ri.deleted_at')
         ->where('sched_id', '=', $request->id)->get();
     }
+
+    public function generateReport(){
+        $today = now()->format('Y-m-d');
+        $today_items = Schedule::with(['participants_info', 'category', 'participants'])
+            ->whereDate('date_from', '=', $today)
+            ->orWhereDate('date_to', '=', $today)
+            ->get();
+        return Inertia::render('Admin/GenerateReport', [
+            'total_items' => $today_items, 
+        ]);
+    }
 }

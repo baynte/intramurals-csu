@@ -239,6 +239,14 @@ const removeItem = (schedule) => {
   items.value = items.value.filter(x => x.id != schedule)
   axios.delete(route('admin.schedule.destroy', {schedule}))
 }
+
+const generateLink = () => {
+  window.open(
+      route('admin.generate-report'),
+      'targetWindow',
+      `toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=595,height=842`
+  );
+}
 </script>
 <template>
   <Admin>
@@ -250,6 +258,7 @@ const removeItem = (schedule) => {
       Schedules
     </template>
     <template #header-items>
+      <VBtn variant="tonal" @click="generateLink" class="mr-1">Generate Report</VBtn>
       <VBtn variant="tonal" @click="toggleForm">Create Schedule</VBtn>
       <!-- <VBtn variant="tonal" @click="showFilter = true" prepend-icon="mdi-filter" class="ml-2">{{filterCounter ? `${filterCounter} - Filtered` : "Filter"}}</VBtn> -->
     </template>
