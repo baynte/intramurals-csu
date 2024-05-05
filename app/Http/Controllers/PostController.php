@@ -27,7 +27,16 @@ class PostController extends Controller
             'name' => 'required|string|min:3',
             'description' => 'required|string|min:3',
         ]);
-        Post::create($validated);
+
+        $post = Post::create($validated);
+        if($request->has('file')){
+            $file = $request->file('file');
+            $path = $file->store('bg', ['disk' => 'public']);
+    
+            $post->bg_path = $path;
+            $post->save();
+        }
+
         return redirect()->back();
     }
 

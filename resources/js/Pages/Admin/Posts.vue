@@ -22,6 +22,7 @@ const form = useForm({
   name: "",
   year: "2024",
   bg_path: "",
+  file: null,
   description: "To be described"
 })
 
@@ -134,6 +135,7 @@ getItems()
             </div>
             <VTextField v-model="form.name" label="Title" hide-details></VTextField>
             <VTextarea v-model="form.description" label="Description"/>
+            <VFileInput label="File input" v-model="form.file"></VFileInput>
           </VCardText>
           <VCardActions>
             <VBtn @click="showForm = false" variant="outlined">Close</VBtn>
