@@ -47,11 +47,28 @@ Route::get('/', function () {
 
     $ann = Post::get();
 
+    $total_days = [];
+    $date_to = collect(Schedule::where('year', '=', now()->format('Y'))
+        ->groupBy('date_to')
+        ->select('date_to')
+        ->get())->map(function($obj){ return $obj['date_to'];});
+    $date_from = collect(Schedule::where('year', '=', now()->format('Y'))
+        ->groupBy('date_from')
+        ->select('date_from')
+        ->get())->map(function($obj){ return $obj['date_from'];});
+
+    $total_days[] = $date_from;
+    $total_days[] = $date_to;
+    $collection = collect($total_days);
+    $uniqueDates = $collection->flatten()->unique()->toArray();
+    sort($uniqueDates);
+
     return Inertia::render('public', [
         'today_scheds' => $today_items,
         'tomorrow_scheds' => $tomorrow_items,
         'categories' => Category::get(),
-        'posts' => $ann
+        'posts' => $ann,
+        'total_days' => $uniqueDates
     ]);
 })->name('public');
 

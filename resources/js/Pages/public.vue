@@ -15,7 +15,7 @@ const changePhoto = () => {
 
 setInterval(changePhoto, 3000);
 const props = defineProps([
-  'today_scheds', 'tomorrow_scheds', 'categories', 'posts'
+  'today_scheds', 'tomorrow_scheds', 'categories', 'posts', 'total_days'
 ]);
 
 const today_scheds = ref([])
@@ -500,34 +500,12 @@ const redirectToLogin = () => {
         <div class="mx-auto mt-4 mb-5" style="width: 800px">
           <VRow>
             <VCol cols="5">
-              <VCard>
-                <VToolbar color="#327119">
-                  <VBtn @click="previousMonth" icon>
-                    <VIcon>mdi-chevron-left</VIcon>
-                  </VBtn>
-                  <VToolbarTitle class="text-uppercase">{{ currentMonth }}</VToolbarTitle>
-                  <VBtn @click="nextMonth">
-                    <VIcon>mdi-chevron-right</VIcon>
-                  </VBtn>
-                </VToolbar>
-                <VCardText>
-                  <div class="calendar">
-                    <div class="days">
-                      <div v-for="(day_item, index) in daysInMonth" :key="index" class="day cursor-pointer" @click="changeDateSelected(day_item.value)">
-                        <VAvatar v-if="day_item.isSelected" rounded color="green" size="small">
-                          {{day_item.day}}
-                        </VAvatar>
-                        <VAvatar v-else rounded color="white" size="small">
-                          {{day_item.day}}
-                        </VAvatar>
-                      </div>
-                    </div>
-                  </div>
-                </VCardText>
-                <VCardActions>
-                  <VBtn variant="tonal" @click="backToday">Today</VBtn>
-                </VCardActions>
-              </VCard>
+              <div style="max-height: calc(100vh - 100px); overflow-y: auto">
+                <div v-for="item, index in total_days" @click="changeDateSelected(moment(item, 'YYYY-MM-DD').format('YYYY-MM-D'))" :class="[selectedDate == moment(item, 'YYYY-MM-DD').format('YYYY-MM-D') ? 'bg-p text-white' : 'bg-grey-lighten-3','mb-1 text-left py-2 px-1 rounded cursor-pointer']">
+                  {{ `Day ${index+1}:  ${moment(item, 'YYYY-MM-DD').format('DD MMMM YYYY | dddd')}` }}
+                </div>
+              </div>
+              <!-- <VBtn variant="tonal" @click="backToday" block>Select date Today</VBtn> -->
             </VCol>
             <VCol cols="7">
               <VCard color="#327119" class="mb-3">
